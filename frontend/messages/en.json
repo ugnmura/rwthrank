@@ -1,46 +1,32 @@
 {
-  "nav": {
-    "breadcrumb": "Sign in to your account"
+  "header": {
+    "tagline": "Beta"
   },
-  "content": {
-    "welcomeHeading": "Welcome to rwthrank",
-    "welcomeBody": "rwthrank compares your examination results with those of other students. Upload your transcript of records to see where you stand.",
-    "loginHeading": "Signing in with a one-time code",
-    "loginBody": "We send an eight-digit code to your email address. No password is required.",
-    "firstTimeHeading": "First-time sign-in",
-    "firstTimeBody": "If you are using rwthrank for the first time, your account is created with the first code. There is no separate registration.",
-    "scaleHeading": "About the grading scale"
-  },
-  "panel": {
-    "heading": "Sign-in for students"
+  "hero": {
+    "title": "Compare your transcript",
+    "subtitle": "Upload your transcript and see where you stand right away."
   },
   "form": {
-    "emailLabel": "Email address",
+    "emailLabel": "Email",
     "emailPlaceholder": "ab123456@rwth-aachen.de",
-    "sendCode": "Request code",
+    "sendCode": "Send code",
     "sending": "Sending",
-    "codeLabel": "Code",
-    "codeSentTo": "We have sent a code to {email}. It is valid for five minutes.",
+    "codeLabel": "8-digit code",
+    "codePlaceholder": "12345678",
+    "codeSentTo": "Code sent to {email}. Valid for 5 minutes.",
     "signIn": "Sign in",
     "checking": "Checking",
-    "otherAddress": "Use a different email address"
+    "otherAddress": "Different email"
   },
   "signedIn": {
-    "label": "Signed in as",
-    "next": "Next, upload your transcript of records.",
+    "label": "Signed in",
+    "next": "Upload is coming soon.",
     "signOut": "Sign out"
   },
   "curve": {
-    "title": "Grade distribution",
-    "subtitle": "Sample data, n = {count}",
-    "alt": "Bar chart of the grade distribution from 1.0 to 5.0, with the largest share at 2.3.",
-    "share": "Share",
-    "note": "The German scale has no values between 4.0 and 5.0. A 4.0 is the last passing grade.",
-    "pending": "Your own position appears once you have uploaded a transcript of records."
-  },
-  "footer": {
-    "copyright": "© 2026 rwthrank",
-    "sample": "All distributions shown are sample data."
+    "alt": "Distribution of grades from 1.0 to 5.0. The largest share is at 2.3.",
+    "you": "you",
+    "caption": "Sample data, not real grades. Your line appears right after the upload."
   },
   "language": {
     "label": "Language"

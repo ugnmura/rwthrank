@@ -39,10 +39,9 @@
   --color-error: #cc071e;
   --color-error-content: #fff1f2;
 
-  /* Square, like every other campus system the reader already uses. */
-  --radius-selector: 0;
-  --radius-field: 0;
-  --radius-box: 0;
+  --radius-selector: 0.125rem;
+  --radius-field: 0.125rem;
+  --radius-box: 0.25rem;
   --size-selector: 0.25rem;
   --size-field: 0.28rem;
   --border: 1px;
@@ -78,10 +77,9 @@
   --color-error: #ff5a6a;
   --color-error-content: #2b0004;
 
-  /* Square, like every other campus system the reader already uses. */
-  --radius-selector: 0;
-  --radius-field: 0;
-  --radius-box: 0;
+  --radius-selector: 0.125rem;
+  --radius-field: 0.125rem;
+  --radius-box: 0.25rem;
   --size-selector: 0.25rem;
   --size-field: 0.28rem;
   --border: 1px;
@@ -89,22 +87,39 @@
   --noise: 0;
 }
 
-/*
- * No webfont. University systems render in whatever the machine already has,
- * and a characterful display face would be the one thing on the page pretending
- * this is a product launch rather than a login.
- */
 @theme inline {
-  --font-sans: Arial, Helvetica, ui-sans-serif, system-ui, sans-serif;
-  --font-mono: ui-monospace, "SFMono-Regular", "Menlo", "Consolas", monospace;
+  --font-display: var(--font-space-grotesk);
+  --font-sans: var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
 }
 
 body {
-  font-family: var(--font-sans);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
 /* Tabular figures everywhere a grade or a code is shown, so digits don't shift. */
 .tnum {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1;
+}
+
+/* The distribution draws itself once, on load. */
+@keyframes grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.bar {
+  transform-origin: bottom;
+  animation: grow 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar {
+    animation: none;
+  }
 }

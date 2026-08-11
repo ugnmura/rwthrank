@@ -1,46 +1,32 @@
 {
-  "nav": {
-    "breadcrumb": "Bei Ihrem Konto anmelden"
+  "header": {
+    "tagline": "Beta"
   },
-  "content": {
-    "welcomeHeading": "Willkommen bei rwthrank",
-    "welcomeBody": "rwthrank vergleicht Ihre Prüfungsergebnisse mit denen anderer Studierender. Laden Sie Ihren Notenspiegel hoch und sehen Sie, wo Sie im Vergleich stehen.",
-    "loginHeading": "Anmeldung per Einmalcode",
-    "loginBody": "Wir senden Ihnen einen achtstelligen Code an Ihre E-Mail-Adresse. Ein Kennwort benötigen Sie nicht.",
-    "firstTimeHeading": "Erstanmeldung",
-    "firstTimeBody": "Sofern Sie rwthrank zum ersten Mal verwenden, wird Ihr Konto mit dem ersten Code angelegt. Eine gesonderte Registrierung entfällt.",
-    "scaleHeading": "Zur Notenskala"
-  },
-  "panel": {
-    "heading": "Anmeldung für Studierende"
+  "hero": {
+    "title": "Notenspiegel vergleichen",
+    "subtitle": "Lade deinen Notenspiegel hoch und sieh sofort, wo du im Vergleich liegst."
   },
   "form": {
-    "emailLabel": "E-Mail-Adresse",
+    "emailLabel": "E-Mail",
     "emailPlaceholder": "ab123456@rwth-aachen.de",
-    "sendCode": "Code anfordern",
-    "sending": "Wird gesendet",
-    "codeLabel": "Code",
-    "codeSentTo": "Wir haben einen Code an {email} gesendet. Er ist fünf Minuten gültig.",
+    "sendCode": "Code schicken",
+    "sending": "Wird geschickt",
+    "codeLabel": "8-stelliger Code",
+    "codePlaceholder": "12345678",
+    "codeSentTo": "Code an {email} geschickt. Gültig für 5 Minuten.",
     "signIn": "Anmelden",
     "checking": "Wird geprüft",
-    "otherAddress": "Andere E-Mail-Adresse verwenden"
+    "otherAddress": "Andere E-Mail"
   },
   "signedIn": {
-    "label": "Angemeldet als",
-    "next": "Laden Sie als Nächstes Ihren Notenspiegel hoch.",
+    "label": "Angemeldet",
+    "next": "Der Upload kommt bald.",
     "signOut": "Abmelden"
   },
   "curve": {
-    "title": "Notenverteilung",
-    "subtitle": "Beispieldaten, n = {count}",
-    "alt": "Balkendiagramm der Notenverteilung von 1,0 bis 5,0 mit dem höchsten Anteil bei 2,3.",
-    "share": "Anteil",
-    "note": "Im deutschen Notensystem gibt es zwischen 4,0 und 5,0 keine Zwischenwerte. 4,0 ist die letzte bestandene Note.",
-    "pending": "Ihre eigene Position erscheint, sobald Sie einen Notenspiegel hochgeladen haben."
-  },
-  "footer": {
-    "copyright": "© 2026 rwthrank",
-    "sample": "Alle dargestellten Verteilungen sind Beispieldaten."
+    "alt": "Verteilung der Noten von 1,0 bis 5,0. Der größte Anteil liegt bei 2,3.",
+    "you": "du",
+    "caption": "Beispieldaten, keine echten Noten. Deine Linie erscheint direkt nach dem Upload."
   },
   "language": {
     "label": "Sprache"
