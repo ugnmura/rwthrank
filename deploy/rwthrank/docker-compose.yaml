@@ -1,0 +1,37 @@
+# Deployed copy of /srv/rwthrank/docker-compose.yaml on the Hetzner box.
+#
+# The frontend is not here: it runs on Vercel and talks to this over HTTPS.
+# Watchtower pulls :latest whenever the deploy workflow pushes a new image, so
+# nothing SSHes in to release.
+services:
+  rwthrank-backend:
+    image: registry.sushiwaumai.com/rwthrank/backend:latest
+    container_name: rwthrank-backend
+    restart: unless-stopped
+    env_file: backend.env
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          # Transcripts are parsed in memory, but they are a few hundred KB and
+          # one at a time, so the PocketBase baseline still dominates.
+          memory: 512M
+    volumes:
+      - ./pb_data:/pb/pb_data
+    networks:
+      - web
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.rwthrank-api.rule=Host(`rwthrank.sushiwaumai.com`)
+      - traefik.http.routers.rwthrank-api.entrypoints=https
+      - traefik.http.routers.rwthrank-api.tls=true
+      - traefik.http.routers.rwthrank-api.tls.certresolver=letsencrypt
+      - traefik.http.services.rwthrank-api.loadbalancer.server.port=8090
+      - com.centurylinklabs.watchtower.enable=true
+      - diun.enable=false
+
+networks:
+  web:
+    name: web
+    external: true

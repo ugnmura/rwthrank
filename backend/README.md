@@ -62,8 +62,29 @@ Without `--dev` this hook does nothing and real mail is sent.
 | | |
 |---|---|
 | `migrations/1754956800_otp_only_auth.go` | Turns OTP on and password auth off for `users`, and closes the record-create API |
+| `migrations/1754960000_user_program_grade.go` | Adds `program` and `grade` to `users` |
 | `internal/auth/otp.go` | Makes `request-otp` register unknown emails; dev code printing |
 | `internal/config/settings.go` | Applies SMTP and app naming from the environment on boot |
+| `internal/rank/rank.go` | Serves `GET /api/rank` |
+
+## The ranking
+
+`program` and `grade` are ordinary fields on the `users` record, so the frontend
+submits them with a normal `PATCH /api/collections/users/records/:id`. Grades use
+the German scale and are constrained to 1.0-5.0, which also makes the zero value
+mean "not submitted yet".
+
+```sh
+curl http://127.0.0.1:8090/api/rank -H 'Authorization: <token>'
+# -> {"program":"Maschinenbau","grade":2.3,"rank":58,"total":240,"percentile":24.2}
+```
+
+Everyone is ranked only against their own programme — a 2.0 in Maschinenbau and a
+2.0 in Medizin are not the same achievement. Equal grades share a rank, and
+`percentile` is the "top N %" figure, so lower is better.
+
+A user who hasn't submitted anything yet gets `200` with null fields rather than
+an error, which is how the frontend decides between the form and the dashboard.
 
 ## Environment
 

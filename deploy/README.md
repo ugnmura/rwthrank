@@ -1,0 +1,71 @@
+# Deploying
+
+Backend runs on the Hetzner box as a `/srv` stack. Frontend runs on Vercel.
+Nothing in CI SSHes anywhere: the workflow pushes an image and Watchtower on the
+box pulls it, which is how the other stacks there work.
+
+```
+push to main (backend/**)  ->  build  ->  registry.sushiwaumai.com  ->  Watchtower  ->  live
+push to main (frontend/**) ->  Vercel git integration               ->  live
+```
+
+## One-time: the backend stack
+
+Two GitHub secrets on the repo, so the workflow can push:
+
+| | |
+|---|---|
+| `REGISTRY_USERNAME` | registry.sushiwaumai.com login |
+| `REGISTRY_PASSWORD` | its password |
+
+Then on the box:
+
+```sh
+ssh hetzner
+mkdir -p /srv/rwthrank
+# copy deploy/rwthrank/docker-compose.yaml there, then:
+cd /srv/rwthrank
+cp backend.env.example backend.env   # fill in SMTP_PASSWORD
+docker compose up -d
+```
+
+Add `rwthrank` to `APPS` in `/srv/Makefile` so `make up` / `make pull APP=rwthrank`
+cover it like every other stack.
+
+DNS: `rwthrank.sushiwaumai.com` needs an A record on the box before Traefik can
+get a certificate. Traefik picks the container up from its labels, so there is no
+proxy config to edit.
+
+Create the dashboard superuser once the container is running:
+
+```sh
+docker compose exec rwthrank-backend /pb/rwthrank superuser upsert you@example.com <password>
+```
+
+## One-time: the frontend
+
+Import the repo in Vercel and set **Root Directory** to `frontend`. Then one
+environment variable, for all environments:
+
+```
+NEXT_PUBLIC_POCKETBASE_URL = https://rwthrank.sushiwaumai.com
+```
+
+It is read by the browser and inlined at build time, so changing it later needs a
+redeploy, not just a restart.
+
+## Things that will bite
+
+- **SMTP is not optional.** PocketBase deletes an OTP whose email fails to send,
+  so a deployment without working mail issues codes that are already gone by the
+  time anyone types them. Nobody can log in and nothing looks broken in the logs
+  except one error line per attempt.
+- **`pb_data` is the entire database**, bind-mounted from `/srv/rwthrank/pb_data`.
+  It is not in any image and not in git. Back it up.
+- **Disk.** The box was at roughly 72% of 38 GB at last check, before this stack.
+  Images accumulate; `/srv/cleanup.sh` exists for that.
+- **CORS.** The Vercel frontend calls the backend cross-origin. PocketBase allows
+  all origins by default, which is fine here but worth narrowing if that changes.
+- **The frontend Docker image is now unused in production.** `frontend/Dockerfile`
+  still builds, and the local compose stack still uses its `dev` target, but
+  Vercel builds from source and ignores it.

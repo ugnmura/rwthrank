@@ -11,3 +11,7 @@
 
 # playwright screenshots
 .playwright-mcp/
+
+# agent worktrees and stray verification screenshots
+.claude/worktrees/
+*.png

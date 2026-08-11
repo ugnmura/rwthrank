@@ -10,6 +10,7 @@ import (
 
 	"github.com/ugnmura/rwthrank/internal/auth"
 	"github.com/ugnmura/rwthrank/internal/config"
+	"github.com/ugnmura/rwthrank/internal/rank"
 	_ "github.com/ugnmura/rwthrank/migrations"
 )
 
@@ -25,6 +26,7 @@ func main() {
 
 	config.ApplyFromEnv(app)
 	auth.RegisterOTP(app)
+	rank.RegisterRoutes(app)
 
 	if err := app.Start(); err != nil {
 		log.Fatal(err)

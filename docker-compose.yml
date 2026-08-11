@@ -33,7 +33,7 @@ services:
       SENDER_NAME: rwthrank
       SENDER_ADDRESS: no-reply@rwthrank.local
     volumes:
-      - pb_data:/app/pb_data
+      - pb_data:/pb/pb_data
     depends_on:
       mailpit:
         condition: service_healthy
