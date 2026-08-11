@@ -7,43 +7,79 @@ import { useAuthRecord, useLogout, useRequestOtp, useVerifyOtp } from '@/lib/aut
 import { GradeCurve } from './grade-curve'
 import { LocaleSwitcher } from './locale-switcher'
 
+const CODE_LENGTH = 8
+
 export default function Home() {
   const t = useTranslations()
+
+  return (
+    <>
+      <div className="navbar min-h-0 bg-neutral px-0 py-0 text-neutral-content">
+        <div className="navbar-start">
+          <span className="bg-primary px-3 py-3 font-bold text-primary-content">RWTH</span>
+          <span className="px-3 text-lg">rwthrank</span>
+        </div>
+        <div className="navbar-end pr-2">
+          <LocaleSwitcher />
+        </div>
+      </div>
+
+      <div className="breadcrumbs border-b border-base-300 bg-base-200 px-4 py-2 text-sm">
+        <ul>
+          <li>rwthrank</li>
+          <li>{t('nav.breadcrumb')}</li>
+        </ul>
+      </div>
+
+      <div className="flex flex-1 flex-col lg:flex-row">
+        <main className="flex-1 px-4 py-8 lg:px-8">
+          <div className="max-w-2xl space-y-6">
+            <section>
+              <h1 className="mb-3 text-2xl font-bold">{t('content.welcomeHeading')}</h1>
+              <p className="leading-relaxed">{t('content.welcomeBody')}</p>
+            </section>
+
+            <section>
+              <h2 className="mb-2 text-lg font-bold">{t('content.loginHeading')}</h2>
+              <p className="leading-relaxed">{t('content.loginBody')}</p>
+            </section>
+
+            <section>
+              <h2 className="mb-2 text-lg font-bold">{t('content.firstTimeHeading')}</h2>
+              <p className="leading-relaxed">{t('content.firstTimeBody')}</p>
+            </section>
+
+            <div className="divider" />
+
+            <section>
+              <h2 className="mb-3 text-lg font-bold">{t('content.scaleHeading')}</h2>
+              <GradeCurve />
+            </section>
+          </div>
+        </main>
+
+        {/* The action column, kept above the reading matter on a phone. */}
+        <aside className="order-first bg-primary px-4 py-8 text-primary-content lg:order-last lg:w-88 lg:shrink-0 lg:px-6">
+          <SignInPanel />
+        </aside>
+      </div>
+
+      <footer className="footer footer-horizontal justify-between bg-neutral px-4 py-3 text-sm text-neutral-content/80">
+        <span>{t('footer.copyright')}</span>
+        <span>{t('footer.sample')}</span>
+      </footer>
+    </>
+  )
+}
+
+function SignInPanel() {
+  const t = useTranslations('panel')
   const { data: user, isPending } = useAuthRecord()
 
   return (
-    <div className="flex w-full flex-1 flex-col">
-      <header className="mx-auto flex w-full max-w-2xl items-baseline justify-between px-6 pt-8 font-mono text-[11px] tracking-[0.18em] uppercase sm:px-10">
-        <span className="text-base-content/70">rwthrank</span>
-        <LocaleSwitcher />
-      </header>
-
-      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-6 py-12 sm:px-10">
-        <p className="mb-4 font-mono text-[11px] tracking-[0.18em] text-base-content/35 uppercase">
-          {t('header.tagline')}
-        </p>
-        <h1 className="font-display text-4xl leading-[1.05] font-bold tracking-tight text-balance sm:text-5xl">
-          {t('hero.title')}
-        </h1>
-        <p className="mt-3 max-w-sm text-sm leading-relaxed text-base-content/60">
-          {t('hero.subtitle')}
-        </p>
-
-        <div className="mt-8 max-w-sm">
-          {isPending ? (
-            <div className="h-[104px]" aria-hidden />
-          ) : user ? (
-            <SignedIn email={user.email} />
-          ) : (
-            <SignInForm />
-          )}
-        </div>
-      </main>
-
-      {/* Full-bleed on purpose: the distribution is the floor the page stands on. */}
-      <footer className="w-full px-6 pb-8 sm:px-10">
-        <GradeCurve />
-      </footer>
+    <div className="lg:sticky lg:top-8">
+      <h2 className="mb-4 text-xl">{t('heading')}</h2>
+      {isPending ? <div className="h-48" aria-hidden /> : user ? <SignedIn email={user.email} /> : <SignInForm />}
     </div>
   )
 }
@@ -53,15 +89,17 @@ function SignedIn({ email }: { email: string }) {
   const logout = useLogout()
 
   return (
-    <div className="border-l-2 border-primary pl-4">
-      <p className="font-mono text-[11px] tracking-[0.18em] text-base-content/45 uppercase">
-        {t('label')}
-      </p>
-      <p className="mt-1 font-medium break-all">{email}</p>
-      <p className="mt-3 text-sm text-base-content/60">{t('next')}</p>
-      <button onClick={logout} className="btn btn-ghost btn-sm mt-4 -ml-3">
-        {t('signOut')}
-      </button>
+    <div className="card bg-base-100 text-base-content">
+      <div className="card-body gap-3 p-4">
+        <div>
+          <p className="text-sm text-base-content/70">{t('label')}</p>
+          <p className="font-bold break-all">{email}</p>
+        </div>
+        <p className="text-sm">{t('next')}</p>
+        <button onClick={logout} className="btn btn-outline btn-primary btn-block">
+          {t('signOut')}
+        </button>
+      </div>
     </div>
   )
 }
@@ -76,7 +114,7 @@ function SignInForm() {
   const verifyOtp = useVerifyOtp()
 
   // One form, two steps. The same submit registers a new address or signs in an
-  // existing one — the backend deliberately won't tell us which.
+  // existing one, because the backend deliberately will not say which.
   if (!otpId) {
     return (
       <form
@@ -84,19 +122,29 @@ function SignInForm() {
           event.preventDefault()
           requestOtp.mutate(email, { onSuccess: (result) => setOtpId(result.otpId) })
         }}
-        className="space-y-4"
       >
-        <Field
-          label={t('emailLabel')}
-          type="email"
-          value={email}
-          onChange={setEmail}
-          placeholder={t('emailPlaceholder')}
-          autoComplete="email"
-        />
-        <button type="submit" disabled={requestOtp.isPending} className="btn btn-primary w-full">
+        <fieldset className="fieldset">
+          <legend className="fieldset-legend text-primary-content">{t('emailLabel')}</legend>
+          <input
+            type="email"
+            required
+            autoComplete="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder={t('emailPlaceholder')}
+            className="input w-full bg-base-100 text-base-content"
+          />
+        </fieldset>
+
+        <button
+          type="submit"
+          disabled={requestOtp.isPending}
+          className="btn btn-block mt-3 bg-base-100 text-primary"
+        >
+          {requestOtp.isPending && <span className="loading loading-spinner loading-xs" />}
           {requestOtp.isPending ? t('sending') : t('sendCode')}
         </button>
+
         <ErrorNote error={requestOtp.error} />
       </form>
     )
@@ -108,26 +156,42 @@ function SignInForm() {
         event.preventDefault()
         verifyOtp.mutate({ otpId, code })
       }}
-      className="space-y-4"
     >
-      <Field
-        label={t('codeLabel')}
-        type="text"
-        value={code}
-        onChange={setCode}
-        placeholder={t('codePlaceholder')}
-        autoComplete="one-time-code"
-        inputMode="numeric"
-        className="tnum font-mono tracking-[0.3em]"
-        autoFocus
-      />
-      <p className="text-xs text-base-content/50">
-        {t('codeSentTo', { email })}
-      </p>
-      <button type="submit" disabled={verifyOtp.isPending} className="btn btn-primary w-full">
+      <p className="mb-4 text-sm leading-relaxed">{t('codeSentTo', { email })}</p>
+
+      <fieldset className="fieldset">
+        <legend className="fieldset-legend text-primary-content">{t('codeLabel')}</legend>
+        {/* text-lg keeps eight slots inside the panel; .otp sizes itself in ch. */}
+        <div className="otp max-w-full bg-base-100 text-lg text-base-content">
+          <input
+            type="text"
+            inputMode="numeric"
+            pattern={`\\d{${CODE_LENGTH}}`}
+            maxLength={CODE_LENGTH}
+            autoComplete="one-time-code"
+            autoFocus
+            required
+            aria-label={t('codeLabel')}
+            value={code}
+            onChange={(event) => setCode(event.target.value.replace(/\D/g, ''))}
+          />
+          {Array.from({ length: CODE_LENGTH }, (_, slot) => (
+            <span key={slot} />
+          ))}
+        </div>
+      </fieldset>
+
+      <button
+        type="submit"
+        disabled={verifyOtp.isPending}
+        className="btn btn-block mt-3 bg-base-100 text-primary"
+      >
+        {verifyOtp.isPending && <span className="loading loading-spinner loading-xs" />}
         {verifyOtp.isPending ? t('checking') : t('signIn')}
       </button>
+
       <ErrorNote error={verifyOtp.error} />
+
       <button
         type="button"
         onClick={() => {
@@ -135,7 +199,7 @@ function SignInForm() {
           setCode('')
           verifyOtp.reset()
         }}
-        className="link link-hover text-xs text-base-content/50"
+        className="link mt-3 text-sm"
       >
         {t('otherAddress')}
       </button>
@@ -143,37 +207,12 @@ function SignInForm() {
   )
 }
 
-function Field({
-  label,
-  onChange,
-  className = '',
-  ...props
-}: {
-  label: string
-  value: string
-  onChange: (value: string) => void
-} & Omit<React.ComponentProps<'input'>, 'onChange' | 'value'>) {
-  return (
-    <label className="block">
-      <span className="mb-2 block font-mono text-[11px] tracking-[0.18em] text-base-content/55 uppercase">
-        {label}
-      </span>
-      <input
-        {...props}
-        required
-        onChange={(event) => onChange(event.target.value)}
-        className={`input w-full bg-base-200/60 ${className}`}
-      />
-    </label>
-  )
-}
-
 function ErrorNote({ error }: { error: Error | null }) {
   if (!error) return null
 
   return (
-    <p role="alert" className="text-sm text-error">
+    <div role="alert" className="alert alert-error mt-3 text-sm">
       {error.message}
-    </p>
+    </div>
   )
 }

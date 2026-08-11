@@ -1,32 +1,46 @@
 {
-  "header": {
-    "tagline": "Notenspiegel"
+  "nav": {
+    "breadcrumb": "Bei Ihrem Konto anmelden"
   },
-  "hero": {
-    "title": "Sieh, wo du stehst.",
-    "subtitle": "Deine Noten im Vergleich zu allen anderen. Melde dich mit einem Einmalcode an — es gibt kein Passwort, das du vergessen kannst."
+  "content": {
+    "welcomeHeading": "Willkommen bei rwthrank",
+    "welcomeBody": "rwthrank vergleicht Ihre Prüfungsergebnisse mit denen anderer Studierender. Laden Sie Ihren Notenspiegel hoch und sehen Sie, wo Sie im Vergleich stehen.",
+    "loginHeading": "Anmeldung per Einmalcode",
+    "loginBody": "Wir senden Ihnen einen achtstelligen Code an Ihre E-Mail-Adresse. Ein Kennwort benötigen Sie nicht.",
+    "firstTimeHeading": "Erstanmeldung",
+    "firstTimeBody": "Sofern Sie rwthrank zum ersten Mal verwenden, wird Ihr Konto mit dem ersten Code angelegt. Eine gesonderte Registrierung entfällt.",
+    "scaleHeading": "Zur Notenskala"
+  },
+  "panel": {
+    "heading": "Anmeldung für Studierende"
   },
   "form": {
-    "emailLabel": "Uni-E-Mail",
-    "emailPlaceholder": "du@rwth-aachen.de",
-    "sendCode": "Code senden",
-    "sending": "Wird gesendet …",
+    "emailLabel": "E-Mail-Adresse",
+    "emailPlaceholder": "ab123456@rwth-aachen.de",
+    "sendCode": "Code anfordern",
+    "sending": "Wird gesendet",
     "codeLabel": "Code",
-    "codePlaceholder": "12345678",
-    "codeSentTo": "Gesendet an {email}. Gültig für fünf Minuten.",
+    "codeSentTo": "Wir haben einen Code an {email} gesendet. Er ist fünf Minuten gültig.",
     "signIn": "Anmelden",
-    "checking": "Wird geprüft …",
-    "otherAddress": "Andere Adresse verwenden"
+    "checking": "Wird geprüft",
+    "otherAddress": "Andere E-Mail-Adresse verwenden"
   },
   "signedIn": {
-    "label": "Angemeldet",
-    "next": "Als Nächstes: Lade deinen Notenspiegel hoch, um dich einzuordnen.",
+    "label": "Angemeldet als",
+    "next": "Laden Sie als Nächstes Ihren Notenspiegel hoch.",
     "signOut": "Abmelden"
   },
   "curve": {
-    "alt": "Beispielverteilung deutscher Noten von 1,0 bis 5,0 mit dem Höchstwert bei 2,3.",
-    "you": "du",
-    "caption": "Beispielverteilung. 1,0 ist die beste Note und 4,0 die letzte bestandene — lade deinen Notenspiegel hoch, um die gestrichelte Linie durch deine eigene zu ersetzen."
+    "title": "Notenverteilung",
+    "subtitle": "Beispieldaten, n = {count}",
+    "alt": "Balkendiagramm der Notenverteilung von 1,0 bis 5,0 mit dem höchsten Anteil bei 2,3.",
+    "share": "Anteil",
+    "note": "Im deutschen Notensystem gibt es zwischen 4,0 und 5,0 keine Zwischenwerte. 4,0 ist die letzte bestandene Note.",
+    "pending": "Ihre eigene Position erscheint, sobald Sie einen Notenspiegel hochgeladen haben."
+  },
+  "footer": {
+    "copyright": "© 2026 rwthrank",
+    "sample": "Alle dargestellten Verteilungen sind Beispieldaten."
   },
   "language": {
     "label": "Sprache"

@@ -14,33 +14,40 @@ export function LocaleSwitcher() {
   const [pending, startTransition] = useTransition()
 
   return (
-    <div className="flex items-center gap-2" aria-label={t('label')}>
-      {locales.map((locale, index) => (
-        <span key={locale} className="flex items-center gap-2">
-          {index > 0 && <span aria-hidden className="text-base-content/20">/</span>}
-          <button
-            type="button"
-            lang={locale}
-            disabled={pending || locale === active}
-            aria-current={locale === active ? 'true' : undefined}
-            onClick={() =>
-              startTransition(async () => {
-                await setUserLocale(locale)
-                // The messages are resolved on the server, so the tree has to
-                // be re-fetched rather than swapped client-side.
-                router.refresh()
-              })
-            }
-            className={
-              locale === active
-                ? 'text-base-content/70'
-                : 'text-base-content/35 underline-offset-4 hover:text-base-content/70 hover:underline'
-            }
-          >
-            {localeNames[locale]}
-          </button>
-        </span>
-      ))}
+    <div className="dropdown dropdown-end">
+      <div
+        tabIndex={0}
+        role="button"
+        aria-label={t('label')}
+        className="btn btn-ghost btn-sm text-neutral-content"
+      >
+        {active.toUpperCase()}
+        <svg width="10" height="6" viewBox="0 0 10 6" aria-hidden fill="currentColor">
+          <path d="M0 0h10L5 6z" />
+        </svg>
+      </div>
+      <ul tabIndex={0} className="dropdown-content menu z-10 w-32 bg-base-100 p-0 shadow">
+        {locales.map((locale) => (
+          <li key={locale}>
+            <button
+              type="button"
+              lang={locale}
+              disabled={pending}
+              className={locale === active ? 'menu-active' : undefined}
+              onClick={() =>
+                startTransition(async () => {
+                  await setUserLocale(locale)
+                  // Messages resolve on the server, so the tree is re-fetched
+                  // rather than swapped client-side.
+                  router.refresh()
+                })
+              }
+            >
+              {localeNames[locale]}
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }
