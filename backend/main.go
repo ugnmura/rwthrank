@@ -9,6 +9,7 @@ import (
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
 
 	"github.com/ugnmura/rwthrank/internal/auth"
+	"github.com/ugnmura/rwthrank/internal/config"
 	_ "github.com/ugnmura/rwthrank/migrations"
 )
 
@@ -22,6 +23,7 @@ func main() {
 		Automigrate: isGoRun,
 	})
 
+	config.ApplyFromEnv(app)
 	auth.RegisterOTP(app)
 
 	if err := app.Start(); err != nil {

@@ -1,0 +1,66 @@
+name: rwthrank
+
+services:
+  # Catches every outgoing email and shows it at http://localhost:8025.
+  # Nothing leaves the machine, so real addresses are safe to test with.
+  mailpit:
+    image: axllent/mailpit:v1.30
+    restart: unless-stopped
+    ports:
+      - "${MAILPIT_UI_PORT:-8025}:8025" # web UI
+      - "${MAILPIT_SMTP_PORT:-1025}:1025" # SMTP
+    environment:
+      MP_MAX_MESSAGES: 500
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    healthcheck:
+      test: ["CMD", "/mailpit", "readyz"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT:-8090}:8090"
+    environment:
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+      APP_NAME: rwthrank
+      APP_URL: http://localhost:${BACKEND_PORT:-8090}
+      SENDER_NAME: rwthrank
+      SENDER_ADDRESS: no-reply@rwthrank.local
+    volumes:
+      - pb_data:/app/pb_data
+    depends_on:
+      mailpit:
+        condition: service_healthy
+    # Deliberately not --dev: that mode prints codes to the log and skips the
+    # send, which would route around Mailpit entirely.
+    command: ["serve", "--http=0.0.0.0:8090"]
+
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    environment:
+      # Read by the browser, not by the container, so it points at the published
+      # port rather than the "backend" service name.
+      NEXT_PUBLIC_POCKETBASE_URL: http://localhost:${BACKEND_PORT:-8090}
+      WATCHPACK_POLLING: "true"
+    volumes:
+      - ./frontend:/app
+      # Keep the image's builds of these; the host copies are the wrong libc.
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  pb_data:

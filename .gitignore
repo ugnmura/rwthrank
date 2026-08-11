@@ -1,3 +1,13 @@
-/pb_data/
-/pb_public/
-/rwthrank
+/backend/pb_data/
+/backend/pb_public/
+/backend/rwthrank
+
+/frontend/node_modules/
+/frontend/.next/
+/frontend/out/
+
+# transcripts and any other PDFs stay local
+*.pdf
+
+# playwright screenshots
+.playwright-mcp/

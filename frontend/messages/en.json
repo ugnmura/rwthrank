@@ -1,0 +1,34 @@
+{
+  "header": {
+    "tagline": "Transcript"
+  },
+  "hero": {
+    "title": "See where you land.",
+    "subtitle": "Your grades, against everyone else's. Sign in with a one-time code — there's no password to forget."
+  },
+  "form": {
+    "emailLabel": "University email",
+    "emailPlaceholder": "you@rwth-aachen.de",
+    "sendCode": "Send code",
+    "sending": "Sending …",
+    "codeLabel": "Code",
+    "codePlaceholder": "12345678",
+    "codeSentTo": "Sent to {email}. Expires in five minutes.",
+    "signIn": "Sign in",
+    "checking": "Checking …",
+    "otherAddress": "Use a different address"
+  },
+  "signedIn": {
+    "label": "Signed in",
+    "next": "Next: upload your transcript to place yourself on the curve.",
+    "signOut": "Sign out"
+  },
+  "curve": {
+    "alt": "Sample distribution of German grades from 1.0 to 5.0, peaking at 2.3.",
+    "you": "you",
+    "caption": "Sample distribution. 1.0 is the best mark and 4.0 the last passing one — upload a transcript to replace the dashed line with your own."
+  },
+  "language": {
+    "label": "Language"
+  }
+}

@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+@plugin "daisyui" {
+  themes:
+    rwth --default,
+    rwth-dark --prefersdark;
+}
+
+/*
+ * Colours are RWTH's own institutional set — the blue, the magenta, the petrol.
+ * Flat and borderless (depth 0), because the page is meant to read like a plot
+ * on paper rather than a stack of cards.
+ */
+@plugin "daisyui/theme" {
+  name: "rwth";
+  default: true;
+  color-scheme: light;
+
+  --color-base-100: #eef2f6;
+  --color-base-200: #e3e9f0;
+  --color-base-300: #cfd9e4;
+  --color-base-content: #0b1f33;
+
+  --color-primary: #00549f;
+  --color-primary-content: #f2f7fc;
+  --color-secondary: #e30066;
+  --color-secondary-content: #fff0f6;
+  --color-accent: #0098a1;
+  --color-accent-content: #01262a;
+  --color-neutral: #0b1f33;
+  --color-neutral-content: #eef2f6;
+
+  --color-info: #64a0c8;
+  --color-info-content: #04121d;
+  --color-success: #57ab27;
+  --color-success-content: #f3faee;
+  --color-warning: #f6a800;
+  --color-warning-content: #2b1c00;
+  --color-error: #cc071e;
+  --color-error-content: #fff1f2;
+
+  --radius-selector: 0.125rem;
+  --radius-field: 0.125rem;
+  --radius-box: 0.25rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.28rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: "rwth-dark";
+  prefersdark: true;
+  color-scheme: dark;
+
+  --color-base-100: #071522;
+  --color-base-200: #0c1e30;
+  --color-base-300: #17304a;
+  --color-base-content: #d6e2ee;
+
+  --color-primary: #5fa8df;
+  --color-primary-content: #04121d;
+  --color-secondary: #ff4d8d;
+  --color-secondary-content: #2b0011;
+  --color-accent: #22b8c0;
+  --color-accent-content: #01262a;
+  --color-neutral: #d6e2ee;
+  --color-neutral-content: #071522;
+
+  --color-info: #64a0c8;
+  --color-info-content: #04121d;
+  --color-success: #7ec95a;
+  --color-success-content: #06180b;
+  --color-warning: #ffc247;
+  --color-warning-content: #2b1c00;
+  --color-error: #ff5a6a;
+  --color-error-content: #2b0004;
+
+  --radius-selector: 0.125rem;
+  --radius-field: 0.125rem;
+  --radius-box: 0.25rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.28rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@theme inline {
+  --font-display: var(--font-space-grotesk);
+  --font-sans: var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
+}
+
+body {
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Tabular figures everywhere a grade or a code is shown, so digits don't shift. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* The distribution draws itself once, on load. */
+@keyframes grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.bar {
+  transform-origin: bottom;
+  animation: grow 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar {
+    animation: none;
+  }
+}
