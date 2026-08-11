@@ -66,6 +66,32 @@ Without `--dev` this hook does nothing and real mail is sent.
 | `internal/auth/otp.go` | Makes `request-otp` register unknown emails; dev code printing |
 | `internal/config/settings.go` | Applies SMTP and app naming from the environment on boot |
 | `internal/rank/rank.go` | Serves `GET /api/rank` |
+| `internal/transcript/` | Parses a Notenspiegel PDF; serves `POST /api/transcript` |
+
+## Transcripts
+
+`POST /api/transcript` takes a Notenspiegel PDF as multipart `file` and returns
+what it read:
+
+```sh
+curl -X POST http://127.0.0.1:8090/api/transcript \
+  -H 'Authorization: <token>' -F file=@transcript.pdf
+# -> {"program":"Maschinenbau","grade":2.3,"credits":96,"maxCredits":180,"moduleCount":17}
+```
+
+**The upload is parsed in memory and discarded.** Holding other students' full
+transcripts, with their name, date of birth and Matrikelnummer in them, is a
+liability the product does not need — the numbers are all it wants.
+
+Extraction is geometric rather than delimiter-based: text fragments are grouped
+into lines by their Y coordinate and split into columns on X gaps wider than
+`1.2 × font size`. That matters because the library decodes the column separator
+glyph as U+FFFD, so anything keyed on the separator character would be building
+on a bug. Letters, umlauts included, come through correctly.
+
+The parsed modules' credits sum to exactly the printed Gesamtcredits, which is the
+invariant the tests assert: a roll-up row leaking into the module list
+double-counts a whole Modulbereich, and a dropped module loses its own.
 
 ## The ranking
 

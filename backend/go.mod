@@ -3,6 +3,7 @@ module github.com/ugnmura/rwthrank
 go 1.26.4
 
 require (
+	github.com/ledongthuc/pdf v0.0.0-20250511090121-5959a4027728
 	github.com/pocketbase/dbx v1.12.0
 	github.com/pocketbase/pocketbase v0.39.10
 )
