@@ -260,6 +260,8 @@ export function useResults(transcript?: string) {
 /** Where the caller stands in one class. */
 export type CourseRank = {
   course: string
+  cohortAverage: number | null
+  cohortMedian: number | null
   grade: number | null
   rank: number | null
   total: number
@@ -296,6 +298,7 @@ export type Comparison = {
   total: number
   percentile: number | null
   cohortAverage: number | null
+  cohortMedian: number | null
 }
 
 /** Every class the caller has a result in, for building filters from. */

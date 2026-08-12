@@ -214,6 +214,8 @@
     "noMatches": "No class found.",
     "removeClass": "Remove {name}",
     "official": "Overall grade as printed on your transcript",
-    "computed": "Computed from the classes you selected"
+    "computed": "Computed from the classes you selected",
+    "cohortMedian": "Median",
+    "medianDesc": "the grade in the middle"
   }
 }

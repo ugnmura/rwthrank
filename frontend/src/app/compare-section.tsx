@@ -105,6 +105,13 @@ export function CompareSection() {
                     <div className="stat-desc">{t('cohortDesc')}</div>
                   </div>
                   <div className="stat">
+                    <div className="stat-title">{t('cohortMedian')}</div>
+                    <div className="stat-value tnum text-2xl">
+                      {data.cohortMedian ? grade(data.cohortMedian) : '—'}
+                    </div>
+                    <div className="stat-desc">{t('medianDesc')}</div>
+                  </div>
+                  <div className="stat">
                     <div className="stat-title">{t('counted')}</div>
                     <div className="stat-value tnum text-2xl">{format.number(data.courses)}</div>
                     <div className="stat-desc">

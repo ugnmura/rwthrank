@@ -214,6 +214,8 @@
     "noMatches": "Kein Fach gefunden.",
     "removeClass": "{name} entfernen",
     "official": "Gesamtnote laut Notenspiegel",
-    "computed": "Aus den ausgewählten Fächern berechnet"
+    "computed": "Aus den ausgewählten Fächern berechnet",
+    "cohortMedian": "Median",
+    "medianDesc": "die Note in der Mitte"
   }
 }

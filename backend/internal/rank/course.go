@@ -20,11 +20,13 @@ import (
 const coursePath = "/api/rank/course/{id}"
 
 type courseResponse struct {
-	Course     string   `json:"course"`
-	Grade      *float64 `json:"grade"`
-	Rank       *int64   `json:"rank"`
-	Total      int64    `json:"total"`
-	Percentile *float64 `json:"percentile"`
+	Course        string   `json:"course"`
+	CohortAverage *float64 `json:"cohortAverage"`
+	CohortMedian  *float64 `json:"cohortMedian"`
+	Grade         *float64 `json:"grade"`
+	Rank          *int64   `json:"rank"`
+	Total         int64    `json:"total"`
+	Percentile    *float64 `json:"percentile"`
 }
 
 func handleCourseRank(e *core.RequestEvent) error {
@@ -42,6 +44,20 @@ func handleCourseRank(e *core.RequestEvent) error {
 		return e.InternalServerError("Failed to count the class.", err)
 	}
 	out.Total = total
+
+	// What the class looks like as a whole, shown whether or not the caller
+	// sat it: the average moves with a few outliers, the median does not.
+	if total > 0 {
+		stats, err := statsOver(e.App, `
+			SELECT MIN(grade) AS value
+			FROM results
+			WHERE course = {:course} AND grade IS NOT NULL
+			GROUP BY user`, dbx.Params{"course": courseID})
+		if err != nil {
+			return e.InternalServerError("Failed to measure the class.", err)
+		}
+		out.CohortAverage, out.CohortMedian = &stats.Average, &stats.Median
+	}
 
 	// The caller's own standing in it, if they sat it at all.
 	mine, err := bestInCourse(e.App, courseID, e.Auth.Id)

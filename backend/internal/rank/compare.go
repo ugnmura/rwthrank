@@ -52,6 +52,7 @@ type compareResponse struct {
 	Total         int64    `json:"total"`
 	Percentile    *float64 `json:"percentile"`
 	CohortAverage *float64 `json:"cohortAverage"`
+	CohortMedian  *float64 `json:"cohortMedian"`
 }
 
 func handleCompare(e *core.RequestEvent) error {
@@ -139,6 +140,11 @@ func handleCompare(e *core.RequestEvent) error {
 
 	out.Rank, out.Total, out.Percentile = &rank, totals.Total, &percentile
 	out.CohortAverage = &totals.Cohort
+
+	stats, err := statsOver(e.App, "SELECT a.avg AS value FROM ("+averages+") a", params)
+	if err == nil {
+		out.CohortMedian = &stats.Median
+	}
 
 	return e.JSON(http.StatusOK, out)
 }
@@ -273,7 +279,7 @@ func officialAverage(e *core.RequestEvent) error {
 	rank := totals.Better + 1
 	percentile := math.Round(float64(rank)/float64(totals.Total)*1000) / 10
 
-	return e.JSON(http.StatusOK, &compareResponse{
+	result := &compareResponse{
 		Average:       &grade,
 		Credits:       credits,
 		Official:      true,
@@ -281,7 +287,18 @@ func officialAverage(e *core.RequestEvent) error {
 		Total:         totals.Total,
 		Percentile:    &percentile,
 		CohortAverage: &totals.Cohort,
-	})
+	}
+
+	stats, err := statsOver(e.App, `
+		SELECT t.grade AS value FROM transcripts t
+		WHERE t.grade IS NOT NULL
+		  AND t.id = (SELECT id FROM transcripts WHERE user = t.user ORDER BY uploaded DESC LIMIT 1)`,
+		dbx.Params{})
+	if err == nil {
+		result.CohortMedian = &stats.Median
+	}
+
+	return e.JSON(http.StatusOK, result)
 }
 
 // latestTranscript is the caller's most recent document.
