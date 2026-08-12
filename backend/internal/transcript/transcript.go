@@ -5,7 +5,7 @@
 // from the printed table. A Notenspiegel is a flat list — nothing is indented —
 // in which three kinds of line look identical:
 //
-//	Modulbereich Praktische Maschinenbau|1,5|N|27,00|12.08.2025   a total
+//	Modulbereich Konstruktionstechnik|1,5|N|27,00|12.08.2025   a total
 //	Programmierung|1,7|N|8,00|07.02.2024                        a module
 //	Programmierung|1,7|BE|N|8,00|07.02.2024|23W                 an attempt
 //
@@ -35,7 +35,7 @@ var ErrNotNotenspiegel = errors.New("not an RWTH Notenspiegel")
 
 // Transcript is the summary of a Notenspiegel plus every module it lists.
 type Transcript struct {
-	Program    string   // "Maschinenbau"
+	Program    string   // e.g. "Maschinenbau"
 	Grade      float64  // Gesamtnote, e.g. 2.3
 	Credits    float64  // Gesamtcredits earned so far
 	MaxCredits float64  // credits the programme requires
