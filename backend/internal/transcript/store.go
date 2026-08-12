@@ -19,7 +19,7 @@ const (
 // Everything happens in a transaction. A half-written transcript — the summary
 // saved but its modules missing — would read as a complete one and quietly skew
 // every per-course ranking it touched.
-func Store(app core.App, userID string, parsed *Transcript, pdf []byte, filename string) (string, error) {
+func Store(app core.App, userID string, parsed *Transcript, pdf []byte, filename string, confirmed bool) (string, error) {
 	var transcriptID string
 
 	err := app.RunInTransaction(func(tx core.App) error {
@@ -41,6 +41,15 @@ func Store(app core.App, userID string, parsed *Transcript, pdf []byte, filename
 			if older := previous.GetString("issued"); older != "" && parsed.Issued != "" && parsed.Issued < older {
 				return ErrOlderTranscript
 			}
+
+			// Whether anything is replaced depends on what the document turned
+			// out to be, which is only known here. Asking before the upload
+			// would mean asking on every upload, including the ones that
+			// replace nothing.
+			if !confirmed {
+				return ErrWouldReplace
+			}
+
 			if err := tx.Delete(previous); err != nil {
 				return err
 			}

@@ -31,6 +31,10 @@ import (
 
 // ErrNotNotenspiegel reports that the file was read but is not a transcript.
 // Callers that serve uploads should treat it as a client error.
+// ErrWouldReplace is returned when an upload would replace a stored transcript
+// and the caller has not said that is what they want.
+var ErrWouldReplace = errors.New("would replace a stored transcript")
+
 // ErrOlderTranscript is returned when an upload predates the stored one.
 var ErrOlderTranscript = errors.New("the stored transcript is newer")
 

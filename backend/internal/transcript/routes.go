@@ -97,10 +97,24 @@ func handleUpload(e *core.RequestEvent) error {
 		return e.InternalServerError("Failed to read the transcript.", err)
 	}
 
-	id, err := Store(e.App, e.Auth.Id, parsed, data, header.Filename)
+	confirmed := e.Request.URL.Query().Get("replace") == "1"
+
+	id, err := Store(e.App, e.Auth.Id, parsed, data, header.Filename, confirmed)
 	if err != nil {
 		if errors.Is(err, ErrOlderTranscript) {
 			return e.BadRequestError("You already have a newer transcript for this subject.", err)
+		}
+		// 409: the upload is fine, it just collides with something stored. The
+		// body says what, so the caller can ask about the right one.
+		if errors.Is(err, ErrWouldReplace) {
+			return e.JSON(http.StatusConflict, map[string]any{
+				"status":  http.StatusConflict,
+				"message": "This would replace a stored transcript.",
+				"replaces": map[string]string{
+					"program": parsed.Program,
+					"degree":  parsed.Degree,
+				},
+			})
 		}
 
 		return e.InternalServerError("Failed to store the transcript.", err)

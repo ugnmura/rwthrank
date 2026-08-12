@@ -60,8 +60,23 @@ async function call(path: string, init?: RequestInit) {
  * worth showing. A missing route or a proxy in between answers with something
  * else entirely, and then the status line is the only honest thing left.
  */
+export class WouldReplaceError extends Error {
+  constructor(readonly program: string, readonly degree: string) {
+    super('would replace')
+  }
+}
+
 async function failure(response: Response) {
-  const body = (await response.json().catch(() => null)) as { message?: unknown } | null
+  const body = (await response.json().catch(() => null)) as {
+    message?: unknown
+    replaces?: { program?: string; degree?: string }
+  } | null
+
+  // Not an error the user should read: it is the server asking whether to go
+  // ahead, and it names what is at stake.
+  if (response.status === 409 && body?.replaces) {
+    return new WouldReplaceError(body.replaces.program ?? '', body.replaces.degree ?? '')
+  }
   const message = body?.message
 
   return new Error(
@@ -127,13 +142,16 @@ export function useUploadTranscript() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (file: File) => {
+    mutationFn: ({ file, replace }: { file: File; replace?: boolean }) => {
       const body = new FormData()
       body.set('file', file)
 
       // No Content-Type here on purpose: only the browser knows the multipart
       // boundary it is about to write.
-      return call('/api/transcript', { method: 'POST', body }) as Promise<Transcript>
+      return call(replace ? '/api/transcript?replace=1' : '/api/transcript', {
+        method: 'POST',
+        body,
+      }) as Promise<Transcript>
     },
     // An upload writes a transcript, replaces any previous one for that subject
     // and rewrites its modules, so both the list and the ranking are stale the

@@ -72,7 +72,7 @@
     "applied": "Gespeichert. Deine Platzierung ist aktualisiert.",
     "degree": "Abschluss",
     "confirmTitle": "Notenspiegel ersetzen?",
-    "confirmBody": "Wenn der neue Notenspiegel zum selben Fach und Abschluss gehört, ersetzt er den gespeicherten. Die alte Datei und alle Noten daraus werden dabei gelöscht. Ein älteres Dokument wird abgelehnt. Betrifft:",
+    "confirmBody": "Für {program} · {degree} ist schon ein Notenspiegel gespeichert. Der neue ersetzt ihn, die alte Datei und alle Noten daraus werden gelöscht.",
     "confirm": "Ersetzen",
     "cancel": "Abbrechen"
   },
