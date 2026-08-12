@@ -16,7 +16,7 @@ const (
 	// uploadPath takes a Notenspiegel and answers with its numbers.
 	//
 	//	POST /api/transcript   multipart/form-data, field "file"
-	//	-> {"program":"Maschinenbau","degree":"Bachelor","grade":2.3,"credits":96,"maxCredits":180,"moduleCount":17}
+	//	-> {"id":"...","program":"Maschinenbau","degree":"Bachelor","grade":2.3,"credits":96,"maxCredits":180,"moduleCount":17}
 	uploadPath = "/api/transcript"
 
 	// fileField is the multipart field the PDF arrives in.
@@ -30,6 +30,7 @@ const (
 // uploadResult is the response body. Field names are part of the API the
 // frontend is written against; do not rename them.
 type uploadResult struct {
+	ID          string  `json:"id"`
 	Program     string  `json:"program"`
 	Degree      string  `json:"degree"`
 	Grade       float64 `json:"grade"`
@@ -47,12 +48,14 @@ func RegisterRoutes(app *pocketbase.PocketBase) {
 	})
 }
 
-// handleUpload parses an uploaded Notenspiegel and returns its numbers.
+// handleUpload parses an uploaded Notenspiegel, stores it, and answers with its
+// numbers.
 //
-// The PDF is never written anywhere. It is read into memory, parsed, and
-// dropped when the request ends: someone else's full transcript — name, date of
-// birth, Matrikelnummer, every attempt they ever failed — is a liability worth
-// nothing to us, and the handful of numbers below is all the app needs.
+// The document is kept, along with a row per module, because per-course ranking
+// needs the modules and re-parsing is the only way to recover them otherwise.
+// That makes this the most sensitive thing the app holds: a Notenspiegel carries
+// a name, a date of birth, a Matrikelnummer and every attempt the student ever
+// failed. The file field is protected and both collections are owner-read only.
 func handleUpload(e *core.RequestEvent) error {
 	e.Request.Body = http.MaxBytesReader(e.Response, e.Request.Body, maxUpload)
 
@@ -67,7 +70,7 @@ func handleUpload(e *core.RequestEvent) error {
 	}
 	defer e.Request.MultipartForm.RemoveAll()
 
-	file, _, err := e.Request.FormFile(fileField)
+	file, header, err := e.Request.FormFile(fileField)
 	if err != nil {
 		return e.BadRequestError(fmt.Sprintf("Missing the %q upload.", fileField), err)
 	}
@@ -92,7 +95,13 @@ func handleUpload(e *core.RequestEvent) error {
 		return e.InternalServerError("Failed to read the transcript.", err)
 	}
 
+	id, err := Store(e.App, e.Auth.Id, parsed, data, header.Filename)
+	if err != nil {
+		return e.InternalServerError("Failed to store the transcript.", err)
+	}
+
 	return e.JSON(http.StatusOK, uploadResult{
+		ID:          id,
 		Program:     parsed.Program,
 		Degree:      parsed.Degree,
 		Grade:       parsed.Grade,

@@ -79,9 +79,32 @@ curl -X POST http://127.0.0.1:8090/api/transcript \
 # -> {"program":"Maschinenbau","grade":2.3,"credits":96,"maxCredits":180,"moduleCount":17}
 ```
 
-**The upload is parsed in memory and discarded.** Holding other students' full
-transcripts, with their name, date of birth and Matrikelnummer in them, is a
-liability the product does not need — the numbers are all it wants.
+The upload is **stored**, along with a row per module, because per-course
+ranking needs those rows and re-parsing is the only way to recover them
+otherwise. Three collections carry it:
+
+| | |
+|---|---|
+| `courses` | one row per module name ever seen, so ranking one class is a lookup |
+| `transcripts` | one row per uploaded document, with the PDF on it |
+| `results` | one row per module on one transcript: course id, grade, credits, semester |
+
+A person has several transcripts — a Bachelor and a Master are different
+documents, and re-uploading a semester later is another — so the document is the
+row, not the person.
+
+**This is the most sensitive thing the app holds.** A Notenspiegel carries a
+name, a date of birth, a Matrikelnummer and every attempt the student ever
+failed. The `pdf` field is `Protected`, so it is not reachable at a guessable URL
+and needs a file token even for a superuser. Both `transcripts` and `results` are
+owner-read only and have no create, update or delete rules at all: every write
+happens server-side while parsing. Deleting a user takes their transcripts and
+results with it; deleting a transcript takes its results. Courses survive, being
+shared vocabulary rather than anyone's data.
+
+Course matching is by exact name. RWTH module names have been stable for
+decades, and the unique index on `courses.name` is what keeps two concurrent
+uploads from creating duplicates.
 
 Extraction is geometric rather than delimiter-based: text fragments are grouped
 into lines by their Y coordinate and split into columns on X gaps wider than
