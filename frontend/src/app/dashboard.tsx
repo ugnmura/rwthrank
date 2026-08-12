@@ -5,7 +5,8 @@ import { useFormatter, useTranslations } from 'next-intl'
 import { useRank } from '@/lib/rank'
 
 /**
- * Where the user stands, inside their own program and nowhere else. The scope is
+ * Where the user stands: against everyone by default, or inside their own
+ * programme and degree once those are set. The scope is
  * said twice on purpose: a rank without the field it was measured in is a number
  * people misread.
  */
@@ -43,7 +44,6 @@ export function Dashboard() {
   // as loading rather than as an empty state.
   if (
     !data ||
-    data.program === null ||
     data.grade === null ||
     data.rank === null ||
     data.percentile === null
@@ -66,7 +66,7 @@ export function Dashboard() {
         {t('place', { rank: format.number(data.rank), total: format.number(data.total) })}
       </h1>
       <p className="mt-3 max-w-md text-sm leading-relaxed text-base-content/60">
-        {t('scope', { program: data.program })}
+        {data.scope === 'program' ? t('scope', { program: data.program ?? '' }) : t('scopeOverall')}
       </p>
 
       <div className="stats stats-vertical mt-8 w-full bg-base-200/60 sm:stats-horizontal">
@@ -75,7 +75,7 @@ export function Dashboard() {
           <div className="stat-value tnum text-secondary">
             {t('topValue', { percentile: percent(data.percentile) })}
           </div>
-          <div className="stat-desc">{t('topDesc', { program: data.program })}</div>
+          <div className="stat-desc">{data.scope === 'program' ? t('topDesc', { program: data.program ?? '' }) : t('statOverall')}</div>
         </div>
 
         <div className="stat">
@@ -87,7 +87,7 @@ export function Dashboard() {
         <div className="stat">
           <div className="stat-title">{t('totalLabel')}</div>
           <div className="stat-value tnum">{format.number(data.total)}</div>
-          <div className="stat-desc">{t('totalDesc', { program: data.program })}</div>
+          <div className="stat-desc">{data.scope === 'program' ? t('totalDesc', { program: data.program ?? '' }) : t('statOverall')}</div>
         </div>
       </div>
     </div>

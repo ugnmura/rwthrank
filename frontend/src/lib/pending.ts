@@ -1,5 +1,5 @@
 /**
- * Subject and grade, parked between the form and the confirmation link.
+ * The grade, parked between the form and the confirmation link.
  *
  * The link arrives in a mail client and may open a fresh tab, so the two values
  * cannot simply live in component state. They are not sent to the server before
@@ -10,7 +10,7 @@
  */
 const KEY = 'rwthrank.pending-profile'
 
-export type PendingProfile = { program: string; degree: string; grade: number }
+export type PendingProfile = { grade: number }
 
 export function savePending(profile: PendingProfile) {
   try {
@@ -28,13 +28,7 @@ export function takePending(): PendingProfile | null {
     localStorage.removeItem(KEY)
 
     const parsed = JSON.parse(raw) as PendingProfile
-    if (
-      typeof parsed?.program !== 'string' ||
-      typeof parsed?.degree !== 'string' ||
-      typeof parsed?.grade !== 'number'
-    ) {
-      return null
-    }
+    if (typeof parsed?.grade !== 'number') return null
 
     return parsed
   } catch {

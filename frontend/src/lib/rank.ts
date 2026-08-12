@@ -15,7 +15,10 @@ export type Profile = UsersResponse & { program?: string; degree?: string; grade
 
 /** `GET /api/rank`. Everything but `total` is null until the user has a grade. */
 export type RankSummary = {
+  /** "program" once a subject and degree are set, "overall" until then. */
+  scope: 'program' | 'overall'
   program: string | null
+  degree: string | null
   grade: number | null
   rank: number | null
   total: number
@@ -89,12 +92,12 @@ export function useSaveProfile() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ program, degree, grade }: { program: string; degree: string; grade: number }) => {
+    mutationFn: (patch: { program?: string; degree?: string; grade?: number }) => {
       const record = pb.authStore.record
       // Unreachable from the UI: every caller runs behind a session.
       if (!record) throw new Error('no session')
 
-      return pb.collection('users').update(record.id, { program, degree, grade })
+      return pb.collection('users').update(record.id, patch)
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: rankKey }),
   })

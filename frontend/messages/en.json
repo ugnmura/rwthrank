@@ -4,8 +4,8 @@
   },
   "hero": {
     "title": "Compare your transcript",
-    "subtitle": "Three entries, then you see your rank in your own subject.",
-    "subtitleSignedIn": "Degree, subject and grade are still missing. Then you see your rank."
+    "subtitle": "Two entries, then you see your rank.",
+    "subtitleSignedIn": "Your grade is still missing. Then you see your rank."
   },
   "form": {
     "legend": "Register",
@@ -51,7 +51,9 @@
     "totalDesc": "grades in {program}",
     "loading": "Loading your rank",
     "error": "Your rank cannot be loaded right now.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "scopeOverall": "Compared against every grade. Set your subject below to narrow it.",
+    "statOverall": "all subjects"
   },
   "upload": {
     "title": "Upload your transcript",
@@ -133,5 +135,13 @@
     "trackingTitle": "No tracking",
     "trackingBody": "rwthrank uses no analytics, no profiling and no ad networks. That is why there is no cookie banner.",
     "updated": "Last updated August 2026. This is a general template and is not legal advice."
+  },
+  "filter": {
+    "label": "Your subject only",
+    "help": "Without this you are compared with everyone. Uploading a transcript sets it automatically.",
+    "degreePlaceholder": "Degree",
+    "programPlaceholder": "Subject",
+    "apply": "Apply",
+    "saving": "Saving"
   }
 }

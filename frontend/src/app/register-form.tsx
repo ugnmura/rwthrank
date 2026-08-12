@@ -6,7 +6,7 @@ import { useFormatter, useTranslations } from 'next-intl'
 import { useRequestOtp } from '@/lib/auth'
 import { useSaveProfile } from '@/lib/rank'
 import { savePending } from '@/lib/pending'
-import { DEGREES, parseGrade, PROGRAMS } from '@/lib/study'
+import { parseGrade } from '@/lib/study'
 
 /**
  * Registration in one form: address, subject, grade, one button.
@@ -21,8 +21,6 @@ export function RegisterForm({ signedInEmail }: { signedInEmail?: string }) {
   const format = useFormatter()
 
   const [email, setEmail] = useState('')
-  const [program, setProgram] = useState('')
-  const [degree, setDegree] = useState('')
   const [grade, setGrade] = useState('')
   const [gradeError, setGradeError] = useState(false)
   const [sentTo, setSentTo] = useState<string | null>(null)
@@ -77,13 +75,13 @@ export function RegisterForm({ signedInEmail }: { signedInEmail?: string }) {
         setGradeError(false)
 
         if (signedInEmail) {
-          saveProfile.mutate({ program, degree, grade: parsed })
+          saveProfile.mutate({ grade: parsed })
           return
         }
 
         // Parked rather than sent: the address is not confirmed yet, and the
         // link is what turns these into a record.
-        savePending({ program, degree, grade: parsed })
+        savePending({ grade: parsed })
         requestOtp.mutate(email, { onSuccess: () => setSentTo(email) })
       }}
     >
@@ -103,31 +101,6 @@ export function RegisterForm({ signedInEmail }: { signedInEmail?: string }) {
           />
         )}
 
-        <Select
-          label={t('degreeLabel')}
-          placeholder={t('degreePlaceholder')}
-          value={degree}
-          onChange={setDegree}
-        >
-          {DEGREES.map((name) => (
-            <option key={name} value={name}>
-              {name}
-            </option>
-          ))}
-        </Select>
-
-        <Select
-          label={t('programLabel')}
-          placeholder={t('programPlaceholder')}
-          value={program}
-          onChange={setProgram}
-        >
-          {PROGRAMS.map((name) => (
-            <option key={name} value={name}>
-              {name}
-            </option>
-          ))}
-        </Select>
 
         {/* Typed, not picked. A Gesamtnote is an average, so 1,6 and 2,4 are
             ordinary values that no list of the eleven module marks contains. */}
@@ -189,40 +162,6 @@ function Field({
   )
 }
 
-function Select({
-  label,
-  placeholder,
-  value,
-  onChange,
-  children,
-}: {
-  label: string
-  placeholder: string
-  value: string
-  onChange: (value: string) => void
-  children: React.ReactNode
-}) {
-  return (
-    <label className="block">
-      <span className="mb-2 block font-mono text-[11px] tracking-[0.18em] text-base-content/55 uppercase">
-        {label}
-      </span>
-      <select
-        required
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="select w-full bg-base-200"
-      >
-        {/* Disabled rather than absent, so an empty select fails validation
-            instead of silently submitting the first program in the list. */}
-        <option value="" disabled>
-          {placeholder}
-        </option>
-        {children}
-      </select>
-    </label>
-  )
-}
 
 function ErrorNote({ error }: { error: Error | null }) {
   if (!error) return null

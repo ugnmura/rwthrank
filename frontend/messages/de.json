@@ -4,8 +4,8 @@
   },
   "hero": {
     "title": "Notenspiegel vergleichen",
-    "subtitle": "Drei Angaben, dann siehst du deinen Platz in deinem Fach.",
-    "subtitleSignedIn": "Abschluss, Fach und Note fehlen noch. Danach siehst du deinen Platz."
+    "subtitle": "Zwei Angaben, dann siehst du deinen Platz.",
+    "subtitleSignedIn": "Deine Note fehlt noch. Danach siehst du deinen Platz."
   },
   "form": {
     "legend": "Registrieren",
@@ -51,7 +51,9 @@
     "totalDesc": "Noten in {program}",
     "loading": "Platzierung wird geladen",
     "error": "Die Platzierung lässt sich gerade nicht laden.",
-    "retry": "Nochmal versuchen"
+    "retry": "Nochmal versuchen",
+    "scopeOverall": "Verglichen wird mit allen Noten. Stell unten dein Fach ein, wenn du es genauer willst.",
+    "statOverall": "alle Fächer"
   },
   "upload": {
     "title": "Notenspiegel hochladen",
@@ -133,5 +135,13 @@
     "trackingTitle": "Kein Tracking",
     "trackingBody": "rwthrank verwendet keine Analyse-Tools, kein Profiling und keine Werbenetzwerke. Deshalb gibt es auch kein Cookie-Banner.",
     "updated": "Stand: August 2026. Dieser Text ist eine allgemeine Vorlage und ersetzt keine Rechtsberatung."
+  },
+  "filter": {
+    "label": "Nur dein Fach",
+    "help": "Ohne Angabe wirst du mit allen verglichen. Ein hochgeladener Notenspiegel setzt das automatisch.",
+    "degreePlaceholder": "Abschluss",
+    "programPlaceholder": "Fach",
+    "apply": "Übernehmen",
+    "saving": "Wird gespeichert"
   }
 }

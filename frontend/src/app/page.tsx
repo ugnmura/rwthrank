@@ -11,6 +11,7 @@ import Link from 'next/link'
 import { LocaleSwitcher } from './locale-switcher'
 import { ThemeSwitcher } from './theme-switcher'
 import { AuthButton } from './auth-button'
+import { SubjectFilter } from './subject-filter'
 import { RegisterForm } from './register-form'
 import { TranscriptUpload } from './transcript-upload'
 
@@ -68,7 +69,9 @@ export default function Home() {
           the transcript is the way to correct it. */}
       {showDashboard && (
         <section className="mx-auto w-full max-w-2xl px-6 pb-12 sm:px-10">
-          <TranscriptUpload />
+          <SubjectFilter program={user?.program} degree={user?.degree} />
+
+            <TranscriptUpload />
         </section>
       )}
 

@@ -20,6 +20,9 @@ const usersCollection = "users"
 // response is the wire shape. Everything but total is nullable because a user
 // exists from their first login, long before they submit a grade.
 type response struct {
+	// Scope says what the rank is measured against: "program" once we know the
+	// programme and degree, "overall" until then.
+	Scope      string   `json:"scope"`
 	Program    *string  `json:"program"`
 	Degree     *string  `json:"degree"`
 	Grade      *float64 `json:"grade"`
@@ -52,21 +55,23 @@ func handleRank(e *core.RequestEvent) error {
 	degree := e.Auth.GetString("degree")
 	grade := e.Auth.GetFloat("grade")
 
-	if program == "" || degree == "" {
-		return e.JSON(200, &response{})
-	}
+	// Registration only asks for an email and a grade, so the cohort starts as
+	// everyone and narrows to the programme once a transcript names it. Ranking
+	// against a mixed population is worse than ranking against a matched one,
+	// but it is far better than refusing to answer at all.
+	scoped := program != "" && degree != ""
 
-	total, err := e.App.CountRecords(usersCollection, graded(program, degree))
+	total, err := e.App.CountRecords(usersCollection, cohort(program, degree, scoped))
 	if err != nil {
 		return e.InternalServerError("Failed to count the program.", err)
 	}
 
 	// Grades are constrained to 1.0-5.0, so 0 is unreachable for a submitted one.
 	if grade == 0 {
-		return e.JSON(200, &response{Total: total})
+		return e.JSON(200, &response{Scope: scopeName(scoped), Total: total})
 	}
 
-	better, err := e.App.CountRecords(usersCollection, graded(program, degree), dbx.NewExp(
+	better, err := e.App.CountRecords(usersCollection, cohort(program, degree, scoped), dbx.NewExp(
 		"grade < {:grade}", dbx.Params{"grade": grade},
 	))
 	if err != nil {
@@ -81,23 +86,39 @@ func handleRank(e *core.RequestEvent) error {
 	// The "top N %" figure, so lower is better and rank 1 is never 0%.
 	percentile := math.Round(float64(rank)/float64(total)*1000) / 10
 
-	return e.JSON(200, &response{
-		Program:    &program,
-		Degree:     &degree,
+	out := &response{
+		Scope:      scopeName(scoped),
 		Grade:      &grade,
 		Rank:       &rank,
 		Total:      total,
 		Percentile: &percentile,
-	})
+	}
+	if scoped {
+		out.Program, out.Degree = &program, &degree
+	}
+
+	return e.JSON(200, out)
 }
 
-// graded matches the users in a program at one degree level who have submitted
-// a grade, which is the cohort both the total and the rank are measured against.
+func scopeName(scoped bool) string {
+	if scoped {
+		return "program"
+	}
+
+	return "overall"
+}
+
+// cohort is what the total and the rank are measured against: everyone with a
+// grade, or just the matching programme and degree once those are known.
 //
 // Degree is part of the key because a Master intake has already been filtered on
 // its Bachelor result: those grades sit better, and mixing them would rank a
 // Bachelor student against a population they are not in.
-func graded(program, degree string) dbx.Expression {
+func cohort(program, degree string, scoped bool) dbx.Expression {
+	if !scoped {
+		return dbx.NewExp("grade > 0")
+	}
+
 	return dbx.NewExp(
 		"program = {:program} AND degree = {:degree} AND grade > 0",
 		dbx.Params{"program": program, "degree": degree},
