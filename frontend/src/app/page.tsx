@@ -29,9 +29,9 @@ export default function Home() {
 
   return (
     <div className="flex w-full flex-1 flex-col">
-      <header className="mx-auto flex w-full max-w-2xl items-baseline justify-between px-6 pt-8 font-mono text-[11px] tracking-[0.18em] uppercase sm:px-10">
+      <header className="mx-auto flex w-full max-w-2xl items-center justify-between px-6 pt-8 font-mono text-[11px] tracking-[0.18em] uppercase sm:px-10">
         <span className="text-base-content/70">rwthrank</span>
-        <div className="flex items-baseline gap-4">
+        <div className="flex items-center gap-4">
           <ThemeSwitcher />
           <LocaleSwitcher />
           <AuthButton />

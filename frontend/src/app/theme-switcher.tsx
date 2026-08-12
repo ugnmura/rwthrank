@@ -37,7 +37,7 @@ export function ThemeSwitcher() {
       onClick={() => applyTheme(isDark ? 'rwth' : 'rwth-dark')}
       aria-label={isDark ? t('toLight') : t('toDark')}
       title={isDark ? t('toLight') : t('toDark')}
-      className="text-base-content/40 transition-colors hover:text-base-content/80"
+      className="flex items-center text-base-content/40 transition-colors hover:text-base-content/80"
     >
       {isDark ? <SunIcon /> : <MoonIcon />}
     </button>
