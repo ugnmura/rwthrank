@@ -122,3 +122,49 @@ export function useUploadTranscript() {
     },
   })
 }
+
+/** A stored transcript, as the owner sees it. */
+export type StoredTranscript = {
+  id: string
+  program: string
+  degree: string
+  grade: number
+  credits: number
+  maxCredits: number
+  pdf: string
+  uploaded: string
+}
+
+const transcriptsKey = ['transcripts'] as const
+
+/** The user's own uploads, newest first. */
+export function useTranscripts() {
+  const { data: user } = useAuthRecord()
+
+  return useQuery({
+    queryKey: [...transcriptsKey, user?.id],
+    enabled: Boolean(user),
+    queryFn: () =>
+      pb
+        .collection('transcripts')
+        .getFullList({ sort: '-uploaded' }) as unknown as Promise<StoredTranscript[]>,
+  })
+}
+
+/**
+ * Removes one upload.
+ *
+ * The results hanging off it go too, through the cascade on the relation, so
+ * the ranking is refetched rather than patched.
+ */
+export function useDeleteTranscript() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => pb.collection('transcripts').delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: transcriptsKey })
+      queryClient.invalidateQueries({ queryKey: rankKey })
+    },
+  })
+}

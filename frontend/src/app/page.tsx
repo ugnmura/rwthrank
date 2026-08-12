@@ -14,6 +14,7 @@ import { ThemeSwitcher } from './theme-switcher'
 import { AuthButton } from './auth-button'
 import { SubjectFilter } from './subject-filter'
 import { ScopeFilter } from './scope-filter'
+import { TranscriptList } from './transcript-list'
 import { RegisterForm } from './register-form'
 import { TranscriptUpload } from './transcript-upload'
 
@@ -79,6 +80,8 @@ export default function Home() {
           ) : (
             <SubjectFilter program={user?.program} degree={user?.degree} />
           )}
+
+          <TranscriptList />
 
           <TranscriptUpload />
         </section>

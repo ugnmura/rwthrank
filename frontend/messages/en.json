@@ -146,5 +146,16 @@
     "viewLabel": "View",
     "viewSubject": "{program} only",
     "viewAll": "All subjects"
+  },
+  "transcripts": {
+    "label": "Your transcripts",
+    "delete": "Delete",
+    "deleting": "Deleting",
+    "unknownProgram": "No subject",
+    "summary": "Grade {grade} · {credits} of {maxCredits} credits",
+    "deleteOne": "Delete {program}",
+    "cancel": "Cancel",
+    "confirmTitle": "Delete this transcript?",
+    "confirmBody": "The transcript for {program} and every grade read from it will be deleted. The only way back is uploading the file again."
   }
 }

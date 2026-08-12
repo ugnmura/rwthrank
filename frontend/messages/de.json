@@ -146,5 +146,16 @@
     "viewLabel": "Ansicht",
     "viewSubject": "Nur {program}",
     "viewAll": "Alle Fächer"
+  },
+  "transcripts": {
+    "label": "Deine Notenspiegel",
+    "delete": "Löschen",
+    "deleting": "Wird gelöscht",
+    "unknownProgram": "Ohne Fach",
+    "summary": "Note {grade} · {credits} von {maxCredits} Credits",
+    "deleteOne": "{program} löschen",
+    "cancel": "Abbrechen",
+    "confirmTitle": "Notenspiegel löschen?",
+    "confirmBody": "Der Notenspiegel für {program} und alle daraus gelesenen Noten werden gelöscht. Rückgängig machen lässt sich das nur, indem du die Datei erneut hochlädst."
   }
 }
