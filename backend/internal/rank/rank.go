@@ -19,7 +19,10 @@ import (
 type response struct {
 	// Scope says what the rank is measured against: "program" once the
 	// programme and degree are known, "overall" until then.
-	Scope      string   `json:"scope"`
+	Scope string `json:"scope"`
+	// Transcript is the one being ranked, so the frontend can show which of a
+	// person's documents the number came from.
+	Transcript *string  `json:"transcript"`
 	Program    *string  `json:"program"`
 	Degree     *string  `json:"degree"`
 	Grade      *float64 `json:"grade"`
@@ -47,7 +50,7 @@ func RegisterRoutes(app *pocketbase.PocketBase) {
 // The cohort is one row per person: each user's most recent transcript. Ranking
 // the transcripts themselves would count anyone who uploaded twice twice.
 func handleRank(e *core.RequestEvent) error {
-	mine, err := latest(e.App, e.Auth.Id)
+	mine, err := chosen(e.App, e.Auth.Id, e.Request.URL.Query().Get("transcript"))
 	if err != nil {
 		return e.InternalServerError("Failed to read the transcript.", err)
 	}
@@ -86,8 +89,10 @@ func handleRank(e *core.RequestEvent) error {
 	// The "top N %" figure, so lower is better and rank 1 is never 0%.
 	percentile := math.Round(float64(rank)/float64(total)*1000) / 10
 
+	id := mine.Id
 	out := &response{
 		Scope:      scopeName(scoped),
+		Transcript: &id,
 		Grade:      &grade,
 		Rank:       &rank,
 		Total:      total,
@@ -100,10 +105,20 @@ func handleRank(e *core.RequestEvent) error {
 	return e.JSON(200, out)
 }
 
-// latest returns the caller's most recent transcript, or nil when they have
-// none. Most recent rather than merged: someone who finishes a Bachelor and
-// starts a Master belongs in the Master cohort.
-func latest(app core.App, userID string) (*core.Record, error) {
+// chosen returns the transcript to rank: the one asked for, or the most recent.
+//
+// A person can be studying more than one thing, and each subject is its own
+// comparison, so which document the number comes from is theirs to pick. An id
+// belonging to someone else is treated as absent rather than refused, since it
+// says nothing about whether that transcript exists.
+func chosen(app core.App, userID, wanted string) (*core.Record, error) {
+	if wanted != "" {
+		record, err := app.FindRecordById("transcripts", wanted)
+		if err == nil && record.GetString("user") == userID {
+			return record, nil
+		}
+	}
+
 	found, err := app.FindRecordsByFilter(
 		"transcripts",
 		"user = {:user}",
@@ -121,17 +136,16 @@ func latest(app core.App, userID string) (*core.Record, error) {
 
 // count sizes the cohort, or the part of it doing strictly better than grade.
 //
-// The subquery is what keeps this one row per person: it picks each user's most
-// recent transcript before any of the filtering happens, so someone who
-// uploaded three times is still counted once.
+// The subquery keeps it one row per person, but per subject when scoped: a
+// student with an Informatik Bachelor and a Maschinenbau Master belongs in both
+// cohorts, and their newest document in each is the one that counts. Comparing
+// against everyone instead falls back to one row per person overall.
 func count(app core.App, program, degree string, scoped bool, better float64) (int64, error) {
 	query := app.DB().
 		Select("COUNT(*)").
 		From("transcripts t").
 		Where(dbx.NewExp("t.grade > 0")).
-		AndWhere(dbx.NewExp(
-			"t.id = (SELECT id FROM transcripts WHERE user = t.user ORDER BY uploaded DESC LIMIT 1)",
-		))
+		AndWhere(dbx.NewExp(latestPerPerson(scoped)))
 
 	if scoped {
 		query = query.AndWhere(dbx.NewExp(
@@ -147,6 +161,23 @@ func count(app core.App, program, degree string, scoped bool, better float64) (i
 	err := query.Row(&total)
 
 	return total, err
+}
+
+// latestPerPerson is the subquery that collapses a person to a single row.
+func latestPerPerson(scoped bool) string {
+	if scoped {
+		// Newest per person *per subject*, so two fields of study count twice
+		// across two different cohorts and never twice within one.
+		return `t.id = (
+			SELECT id FROM transcripts
+			WHERE user = t.user AND program = t.program AND degree = t.degree
+			ORDER BY uploaded DESC LIMIT 1
+		)`
+	}
+
+	return `t.id = (
+		SELECT id FROM transcripts WHERE user = t.user ORDER BY uploaded DESC LIMIT 1
+	)`
 }
 
 func scopeName(scoped bool) string {

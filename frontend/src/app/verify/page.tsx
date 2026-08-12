@@ -6,7 +6,6 @@ import { useTranslations } from 'next-intl'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { pb } from '@/lib/pocketbase'
-import { takePending } from '@/lib/pending'
 import { LocaleSwitcher } from '../locale-switcher'
 
 type State = 'checking' | 'done' | 'failed'
@@ -42,18 +41,8 @@ export default function VerifyPage() {
       try {
         await pb.collection('users').authWithOTP(id, code)
 
-        // The subject and grade were parked before the mail went out. Failing
-        // to write them is not a failed verification: the session is real, and
-        // the form asks again for what is missing.
-        const pending = takePending()
-        if (pending) {
-          try {
-            await pb.collection('users').update(pb.authStore.record!.id, pending)
-          } catch {
-            // Left to the signed-in form on the next screen.
-          }
-        }
-
+        // Nothing to apply here: the grade was stored with the account when the
+        // link was requested, so verifying is only about the session.
         await queryClient.invalidateQueries({ queryKey: ['rank'] })
         setState('done')
       } catch (error) {

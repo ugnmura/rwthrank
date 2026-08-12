@@ -28,8 +28,27 @@ func Store(app core.App, userID string, parsed *Transcript, pdf []byte, filename
 			return err
 		}
 
+		// One transcript per subject: a newer document for the same programme
+		// and degree replaces the old one rather than sitting beside it, so a
+		// person's standing in a subject has a single answer.
+		previous, err := sameSubject(tx, userID, parsed.Program, parsed.Degree)
+		if err != nil {
+			return err
+		}
+		if previous != nil {
+			// Only forward. A PDF exported last year can be uploaded today, and
+			// accepting it would roll the student's results back.
+			if older := previous.GetString("issued"); older != "" && parsed.Issued != "" && parsed.Issued < older {
+				return ErrOlderTranscript
+			}
+			if err := tx.Delete(previous); err != nil {
+				return err
+			}
+		}
+
 		record := core.NewRecord(transcripts)
 		record.Set("user", userID)
+		record.Set("issued", parsed.Issued)
 		record.Set("program", parsed.Program)
 		record.Set("degree", parsed.Degree)
 		record.Set("grade", parsed.Grade)
@@ -108,4 +127,27 @@ func courseID(tx core.App, name string) (string, error) {
 	}
 
 	return course.Id, nil
+}
+
+// sameSubject finds the transcript this upload would replace: the one already
+// stored for the same programme and degree. A document with no subject named
+// cannot collide with anything, so it never replaces.
+func sameSubject(tx core.App, userID, program, degree string) (*core.Record, error) {
+	if program == "" || degree == "" {
+		return nil, nil
+	}
+
+	found, err := tx.FindRecordsByFilter(
+		transcriptsCollection,
+		"user = {:user} && program = {:program} && degree = {:degree}",
+		"-uploaded",
+		1,
+		0,
+		dbx.Params{"user": userID, "program": program, "degree": degree},
+	)
+	if err != nil || len(found) == 0 {
+		return nil, err
+	}
+
+	return found[0], nil
 }

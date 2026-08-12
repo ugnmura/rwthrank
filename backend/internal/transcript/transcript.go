@@ -31,10 +31,17 @@ import (
 
 // ErrNotNotenspiegel reports that the file was read but is not a transcript.
 // Callers that serve uploads should treat it as a client error.
+// ErrOlderTranscript is returned when an upload predates the stored one.
+var ErrOlderTranscript = errors.New("the stored transcript is newer")
+
 var ErrNotNotenspiegel = errors.New("not an RWTH Notenspiegel")
 
 // Transcript is the summary of a Notenspiegel plus every module it lists.
 type Transcript struct {
+	// Issued is the date printed on the document, which is what makes one
+	// transcript newer than another. Upload time would not: a PDF exported last
+	// year can be uploaded today.
+	Issued     string   // "2026-08-11", empty when the header has no date
 	Program    string   // e.g. "Maschinenbau"
 	Degree     string   // "Bachelor" or "Master", empty when the line does not say
 	Grade      float64  // Gesamtnote, e.g. 2.3
@@ -108,6 +115,8 @@ const (
 var (
 	creditsSummaryRe = regexp.MustCompile(`^Gesamtcredits:\s*([\d.,]+)\s*/\s*([\d.,]+)`)
 	gradeSummaryRe   = regexp.MustCompile(`^Gesamtnote:\s*([\d.,]+)`)
+	// "Datum: 11.08.2026" in the header of every page.
+	issuedRe = regexp.MustCompile(`^Datum:\s*(\d{2})\.(\d{2})\.(\d{4})`)
 )
 
 // parseLines walks the document top to bottom and collects the grade table.
@@ -144,6 +153,12 @@ func parseLines(lines []Line) (*Transcript, error) {
 			if len(line.Cells) > 1 {
 				t.Degree = degreeOf(line.Cells[1])
 			}
+			continue
+
+		case t.Issued == "" && issuedRe.MatchString(first):
+			// Stored sorted, so string comparison orders two documents.
+			m := issuedRe.FindStringSubmatch(first)
+			t.Issued = m[3] + "-" + m[2] + "-" + m[1]
 			continue
 
 		case t.Program == "" && strings.HasPrefix(first, programLabel):

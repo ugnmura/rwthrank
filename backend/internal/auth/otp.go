@@ -119,6 +119,19 @@ func createAccountOnFirstOTP(app *pocketbase.PocketBase) {
 			record = existing
 		} else {
 			e.App.Logger().Info("Registered account from OTP request", "email", email, "recordId", record.Id)
+
+			// Registration asks for an address and a grade in one form, so the
+			// grade is stored with the account it belongs to. Doing it here
+			// rather than after the link is clicked means it cannot be lost
+			// between the two, and nobody is asked for the same number twice.
+			if grade := requestedGrade(e); grade > 0 {
+				if err := placeholderTranscript(e.App, record.Id, grade); err != nil {
+					// The account exists and the link is about to go out.
+					// Losing the grade costs one form field, not the signup.
+					e.App.Logger().Error("Failed to store the grade from signup",
+						"error", err, "recordId", record.Id)
+				}
+			}
 		}
 
 		e.Record = record
@@ -177,4 +190,41 @@ func requestedEmail(e *core.RecordCreateOTPRequestEvent) (string, error) {
 	}
 
 	return email, nil
+}
+
+// requestedGrade reads the grade the signup form sent alongside the address.
+//
+// PocketBase's own request-otp form ignores anything but the email, so this
+// reads the parsed body directly. Zero means the caller did not send one, which
+// is the ordinary case for signing back in.
+func requestedGrade(e *core.RecordCreateOTPRequestEvent) float64 {
+	info, err := e.RequestInfo()
+	if err != nil {
+		return 0
+	}
+
+	grade, _ := info.Body["grade"].(float64)
+	if grade < 1 || grade > 5 {
+		return 0
+	}
+
+	return grade
+}
+
+// placeholderTranscript records a grade nobody uploaded a document for.
+//
+// It is a transcript like any other, just without a file, a programme or a
+// degree, so everything the ranking reads comes from one place. Uploading a
+// real Notenspiegel later adds a newer one and takes over.
+func placeholderTranscript(app core.App, userID string, grade float64) error {
+	transcripts, err := app.FindCollectionByNameOrId("transcripts")
+	if err != nil {
+		return err
+	}
+
+	record := core.NewRecord(transcripts)
+	record.Set("user", userID)
+	record.Set("grade", grade)
+
+	return app.Save(record)
 }

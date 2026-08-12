@@ -37,7 +37,14 @@ export function useAuthRecord() {
 /** Step one: mail a code. Returns the otpId that step two needs. */
 export function useRequestOtp() {
   return useMutation({
-    mutationFn: (email: string) => pb.collection('users').requestOTP(email),
+    // The grade rides along so the server can store it with the account it
+    // belongs to. Sending it later would mean asking for the same number twice
+    // if anything went wrong in between.
+    mutationFn: ({ email, grade }: { email: string; grade?: number }) =>
+      pb.send('/api/collections/users/request-otp', {
+        method: 'POST',
+        body: { email, ...(grade ? { grade } : {}) },
+      }) as Promise<{ otpId: string }>,
   })
 }
 

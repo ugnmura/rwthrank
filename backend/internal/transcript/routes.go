@@ -44,6 +44,7 @@ func RegisterRoutes(app *pocketbase.PocketBase) {
 	app.OnServe().BindFunc(func(e *core.ServeEvent) error {
 		e.Router.POST(uploadPath, handleUpload).Bind(apis.RequireAuth())
 		registerGradeRoute(e)
+		registerSubjectRoute(e)
 
 		return e.Next()
 	})
@@ -98,6 +99,10 @@ func handleUpload(e *core.RequestEvent) error {
 
 	id, err := Store(e.App, e.Auth.Id, parsed, data, header.Filename)
 	if err != nil {
+		if errors.Is(err, ErrOlderTranscript) {
+			return e.BadRequestError("You already have a newer transcript for this subject.", err)
+		}
+
 		return e.InternalServerError("Failed to store the transcript.", err)
 	}
 

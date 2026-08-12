@@ -5,7 +5,6 @@ import { useFormatter, useTranslations } from 'next-intl'
 
 import { useRequestOtp } from '@/lib/auth'
 import { useSaveGrade } from '@/lib/rank'
-import { savePending } from '@/lib/pending'
 import { parseGrade } from '@/lib/study'
 
 /**
@@ -79,10 +78,7 @@ export function RegisterForm({ signedInEmail }: { signedInEmail?: string }) {
           return
         }
 
-        // Parked rather than sent: the address is not confirmed yet, and the
-        // link is what turns these into a record.
-        savePending({ grade: parsed })
-        requestOtp.mutate(email, { onSuccess: () => setSentTo(email) })
+        requestOtp.mutate({ email, grade: parsed }, { onSuccess: () => setSentTo(email) })
       }}
     >
       <fieldset className="fieldset gap-4">
