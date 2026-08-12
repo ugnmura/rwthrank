@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useFormatter, useTranslations } from 'next-intl'
 
 import { useRequestOtp } from '@/lib/auth'
-import { useSaveProfile } from '@/lib/rank'
+import { useSaveGrade } from '@/lib/rank'
 import { savePending } from '@/lib/pending'
 import { parseGrade } from '@/lib/study'
 
@@ -26,7 +26,7 @@ export function RegisterForm({ signedInEmail }: { signedInEmail?: string }) {
   const [sentTo, setSentTo] = useState<string | null>(null)
 
   const requestOtp = useRequestOtp()
-  const saveProfile = useSaveProfile()
+  const saveGrade = useSaveGrade()
 
   // The mail is out and the next step happens in the inbox. Deliberately no
   // code box: the link is the only way in, so offering both invites the
@@ -53,7 +53,7 @@ export function RegisterForm({ signedInEmail }: { signedInEmail?: string }) {
     )
   }
 
-  const pending = requestOtp.isPending || saveProfile.isPending
+  const pending = requestOtp.isPending || saveGrade.isPending
   const submitLabel = signedInEmail
     ? pending
       ? t('saving')
@@ -75,7 +75,7 @@ export function RegisterForm({ signedInEmail }: { signedInEmail?: string }) {
         setGradeError(false)
 
         if (signedInEmail) {
-          saveProfile.mutate({ grade: parsed })
+          saveGrade.mutate(parsed)
           return
         }
 
@@ -131,7 +131,7 @@ export function RegisterForm({ signedInEmail }: { signedInEmail?: string }) {
       {!signedInEmail && <p className="mt-3 text-xs text-base-content/50">{t('registerHint')}</p>}
 
       <div className="mt-3">
-        <ErrorNote error={requestOtp.error ?? saveProfile.error} />
+        <ErrorNote error={requestOtp.error ?? saveGrade.error} />
       </div>
     </form>
   )

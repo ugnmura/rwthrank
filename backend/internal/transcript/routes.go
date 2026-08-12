@@ -43,6 +43,7 @@ type uploadResult struct {
 func RegisterRoutes(app *pocketbase.PocketBase) {
 	app.OnServe().BindFunc(func(e *core.ServeEvent) error {
 		e.Router.POST(uploadPath, handleUpload).Bind(apis.RequireAuth())
+		registerGradeRoute(e)
 
 		return e.Next()
 	})

@@ -69,9 +69,7 @@
     "credits": "Credits",
     "creditsValue": "{credits} von {maxCredits}",
     "modules": "Module",
-    "apply": "Fach und Note übernehmen",
-    "applying": "Wird übernommen",
-    "applied": "Übernommen. Deine Platzierung ist aktualisiert.",
+    "applied": "Gespeichert. Deine Platzierung ist aktualisiert.",
     "degree": "Abschluss"
   },
   "curve": {

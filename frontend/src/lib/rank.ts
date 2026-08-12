@@ -11,7 +11,9 @@ import type { UsersResponse } from '@/types/pocketbase'
  * yet in the generated types, so they are spelled out here until the next
  * `bun run typegen` picks them up.
  */
-export type Profile = UsersResponse & { program?: string; degree?: string; grade?: number }
+// The account holds an email and nothing else now; everything a ranking
+// needs lives on a transcript.
+export type Profile = UsersResponse
 
 /** `GET /api/rank`. Everything but `total` is null until the user has a grade. */
 export type RankSummary = {
@@ -36,6 +38,7 @@ export type Transcript = {
 }
 
 const rankKey = ['rank'] as const
+const transcriptsKey = ['transcripts'] as const
 
 // Both endpoints sit on PocketBase next to the collections and take the same
 // bearer token, but the SDK only routes to /api/collections — so they are fetched
@@ -85,26 +88,25 @@ export function useRank(view: 'auto' | 'overall' = 'auto') {
 }
 
 /**
- * Writes program, degree and grade onto the caller's own record — the users collection
- * allows exactly that, and nothing else on the record is touched. The SDK folds
- * the response back into `pb.authStore`, so `useAuthRecord` sees it too.
+ * Records a grade nobody uploaded a document for.
+ *
+ * It becomes a transcript with a grade and nothing else, so the ranking reads
+ * every answer from one place instead of the account holding a second one that
+ * a later upload could contradict.
  */
-export function useSaveProfile() {
+export function useSaveGrade() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (patch: { program?: string; degree?: string; grade?: number }) => {
-      const record = pb.authStore.record
-      // Unreachable from the UI: every caller runs behind a session.
-      if (!record) throw new Error('no session')
-
-      return pb.collection('users').update(record.id, patch)
-    },
+    mutationFn: (grade: number) =>
+      call('/api/grade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ grade }),
+      }),
     onSuccess: () => {
-      // Both: the rank re-scopes, and the record behind the filter's current
-      // values is refetched so the controls agree with what was saved.
       queryClient.invalidateQueries({ queryKey: rankKey })
-      queryClient.invalidateQueries({ queryKey: ['auth', 'record'] })
+      queryClient.invalidateQueries({ queryKey: transcriptsKey })
     },
   })
 }
@@ -134,8 +136,6 @@ export type StoredTranscript = {
   pdf: string
   uploaded: string
 }
-
-const transcriptsKey = ['transcripts'] as const
 
 /** The user's own uploads, newest first. */
 export function useTranscripts() {

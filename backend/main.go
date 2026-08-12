@@ -29,6 +29,7 @@ func main() {
 	auth.RegisterOTP(app)
 	rank.RegisterRoutes(app)
 	transcript.RegisterRoutes(app)
+	transcript.RegisterCleanup(app)
 
 	if err := app.Start(); err != nil {
 		log.Fatal(err)

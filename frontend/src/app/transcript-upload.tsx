@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useFormatter, useTranslations } from 'next-intl'
 
-import { useSaveProfile, useUploadTranscript } from '@/lib/rank'
+import { useUploadTranscript } from '@/lib/rank'
 
 /**
  * Reading a transcript is a second, more accurate way to fill in the same two
@@ -16,7 +16,6 @@ export function TranscriptUpload() {
 
   const [file, setFile] = useState<File | null>(null)
   const upload = useUploadTranscript()
-  const apply = useSaveProfile()
 
   const parsed = upload.data
 
@@ -45,7 +44,6 @@ export function TranscriptUpload() {
                 // A different file makes the previous reading, and the offer
                 // that came with it, stale.
                 upload.reset()
-                apply.reset()
               }}
               className="file-input w-full bg-base-100"
             />
@@ -96,32 +94,9 @@ export function TranscriptUpload() {
               <Row label={t('modules')} value={format.number(parsed.moduleCount)} />
             </dl>
 
-            {apply.isSuccess ? (
-              <div role="status" className="alert alert-success alert-soft mt-4">
-                {t('applied')}
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() =>
-                  apply.mutate({
-                    program: parsed.program,
-                    degree: parsed.degree,
-                    grade: parsed.grade,
-                  })
-                }
-                disabled={apply.isPending}
-                className="btn btn-secondary mt-4"
-              >
-                {apply.isPending ? t('applying') : t('apply')}
-              </button>
-            )}
-
-            {apply.error && (
-              <p role="alert" className="mt-2 text-sm text-error">
-                {apply.error.message}
-              </p>
-            )}
+            <div role="status" className="alert alert-success alert-soft mt-4">
+              {t('applied')}
+            </div>
           </div>
         )}
       </div>

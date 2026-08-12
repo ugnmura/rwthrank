@@ -66,14 +66,16 @@ func sendMagicLink(app *pocketbase.PocketBase) {
 		link := fmt.Sprintf("%s/verify#%s.%s",
 			base, url.PathEscape(otpID), url.PathEscape(code))
 
-		// German only for now: the request carries no locale, and the audience
-		// reads German. Worth threading a locale through when that stops holding.
-		e.Message.Subject = "Deine Platzierung bei rwthrank"
-		e.Message.HTML = fmt.Sprintf(`<p>Hallo,</p>
-<p>klick auf den Link, um deine E-Mail zu bestätigen und deine Platzierung zu sehen.</p>
-<p><a href="%s">Platzierung ansehen</a></p>
-<p>Der Link ist fünf Minuten gültig und funktioniert einmal.</p>
-<p>Wenn du das nicht warst, kannst du diese E-Mail ignorieren.</p>`, link)
+		// English, deliberately, even though the site defaults to German. The
+		// request carries no locale, so this would otherwise be German for
+		// everyone — including the international students at an RWTH who may
+		// not read it. English is the one both halves of the audience share.
+		e.Message.Subject = "Your rwthrank sign-in link"
+		e.Message.HTML = fmt.Sprintf(`<p>Hello,</p>
+<p>Open this link to confirm your email address and see your rank.</p>
+<p><a href="%s">See my rank</a></p>
+<p>The link is valid for five minutes and works once.</p>
+<p>If this wasn't you, you can ignore this email.</p>`, link)
 
 		return e.Next()
 	})

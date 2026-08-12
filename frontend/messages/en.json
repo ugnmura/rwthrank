@@ -69,9 +69,7 @@
     "credits": "Credits",
     "creditsValue": "{credits} of {maxCredits}",
     "modules": "Modules",
-    "apply": "Apply subject and grade",
-    "applying": "Applying",
-    "applied": "Applied. Your rank is up to date.",
+    "applied": "Saved. Your rank is up to date.",
     "degree": "Degree"
   },
   "curve": {

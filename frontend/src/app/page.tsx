@@ -12,7 +12,6 @@ import Link from 'next/link'
 import { LocaleSwitcher } from './locale-switcher'
 import { ThemeSwitcher } from './theme-switcher'
 import { AuthButton } from './auth-button'
-import { SubjectFilter } from './subject-filter'
 import { ScopeFilter } from './scope-filter'
 import { TranscriptList } from './transcript-list'
 import { RegisterForm } from './register-form'
@@ -26,12 +25,12 @@ export default function Home() {
   const [view, setView] = useState<'auto' | 'overall'>('auto')
   const rank = useRank(view)
 
-  // /api/rank has the last word once it answers: nulls there mean an account
-  // without a grade. Until then the record we just wrote stands in, so a slow or
-  // unreachable endpoint never throws a ranked user back into the form.
-  const ranked = rank.data ? rank.data.grade !== null : user?.grade != null
+  // The account carries nothing to fall back on any more, so the endpoint is
+  // the only source: a null grade there means nobody has entered one yet.
+  const ranked = rank.data?.grade != null
   const showDashboard = !!user && ranked
-  const hasSubject = Boolean(user?.program && user?.degree)
+  // The subject only exists once a transcript named it.
+  const hasSubject = Boolean(rank.data?.program && rank.data?.degree)
 
   return (
     <div className="flex w-full flex-1 flex-col">
@@ -73,12 +72,8 @@ export default function Home() {
           the transcript is the way to correct it. */}
       {showDashboard && (
         <section className="mx-auto w-full max-w-2xl space-y-8 px-6 pb-12 sm:px-10">
-          {/* Ask for the subject only while it is missing; once it is known the
-              same space becomes the switch between that subject and everyone. */}
-          {hasSubject ? (
-            <ScopeFilter view={view} onChange={setView} program={user!.program!} />
-          ) : (
-            <SubjectFilter program={user?.program} degree={user?.degree} />
+          {hasSubject && (
+            <ScopeFilter view={view} onChange={setView} program={rank.data?.program ?? ''} />
           )}
 
           <TranscriptList />
