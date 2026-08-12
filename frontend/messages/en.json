@@ -217,5 +217,16 @@
     "computed": "Computed from the classes you selected",
     "cohortMedian": "Median",
     "medianDesc": "the grade in the middle"
+  },
+  "login": {
+    "title": "Sign in",
+    "emailLabel": "Email",
+    "emailPlaceholder": "ab123456@rwth-aachen.de",
+    "submit": "Send link",
+    "sending": "Sending",
+    "hint": "You get a link by email. No password.",
+    "sentLabel": "Email on its way",
+    "sentBody": "Open the link in the email and you are in. The link is good for five minutes.",
+    "otherAddress": "Different email"
   }
 }

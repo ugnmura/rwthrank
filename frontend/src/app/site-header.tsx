@@ -23,10 +23,7 @@ export function SiteHeader() {
   const path = usePathname()
   const { data: user } = useAuthRecord()
 
-  const links = [
-    { href: '/dashboard', label: t('dashboard') },
-    { href: '/dashboard/compare', label: t('compare') },
-  ]
+  const links = [{ href: '/dashboard', label: t('dashboard') }]
 
   return (
     <>

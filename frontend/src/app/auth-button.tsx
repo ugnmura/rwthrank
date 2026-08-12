@@ -8,10 +8,9 @@ import { useAuthRecord, useLogout } from '@/lib/auth'
 /**
  * The header's account control.
  *
- * Signed out it says "sign in" and drops focus into the email field, because
- * signing in and registering are the same form: there is no separate login page
- * to send anyone to. Signed in it is a menu, which keeps signing out and
- * deleting an account one step further away than anything else in the header.
+ * Signed out it links to the login page, which asks for an address and nothing
+ * else. Signed in it is a menu, which keeps signing out and deleting an account
+ * one step further away than anything else in the header.
  */
 export function AuthButton() {
   const t = useTranslations('nav')
@@ -57,16 +56,8 @@ export function AuthButton() {
   }
 
   return (
-    <button
-      type="button"
-      onClick={() => {
-        const email = document.querySelector<HTMLInputElement>('input[type="email"]')
-        email?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        email?.focus({ preventScroll: true })
-      }}
-      className="text-base-content/70 underline-offset-4 hover:underline"
-    >
+    <Link href="/login" className="text-base-content/70 underline-offset-4 hover:underline">
       {t('signIn')}
-    </button>
+    </Link>
   )
 }

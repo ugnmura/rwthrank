@@ -217,5 +217,16 @@
     "computed": "Aus den ausgewählten Fächern berechnet",
     "cohortMedian": "Median",
     "medianDesc": "die Note in der Mitte"
+  },
+  "login": {
+    "title": "Anmelden",
+    "emailLabel": "E-Mail",
+    "emailPlaceholder": "ab123456@rwth-aachen.de",
+    "submit": "Link schicken",
+    "sending": "Wird geschickt",
+    "hint": "Du bekommst einen Link per E-Mail. Kein Passwort.",
+    "sentLabel": "E-Mail unterwegs",
+    "sentBody": "Klick den Link in der E-Mail, dann bist du drin. Der Link gilt fünf Minuten.",
+    "otherAddress": "Andere E-Mail"
   }
 }

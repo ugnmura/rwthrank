@@ -26,17 +26,27 @@ export function Breadcrumbs() {
   }
 
   return (
-    <nav className="breadcrumbs mx-auto w-full max-w-2xl px-6 pt-4 text-sm sm:px-10">
+    <nav className="breadcrumbs mx-auto w-full max-w-2xl px-6 pt-3 text-xs text-base-content/35 sm:px-10">
       <ul>
         <li>
-          <Link href="/">rwthrank</Link>
+          <Link href="/" className="hover:text-base-content/70">rwthrank</Link>
         </li>
         {segments.map((segment, index) => {
           const href = '/' + segments.slice(0, index + 1).join('/')
           const label = labels[segment] ?? segment
           const last = index === segments.length - 1
 
-          return <li key={href}>{last ? label : <Link href={href}>{label}</Link>}</li>
+          return (
+            <li key={href}>
+              {last ? (
+                label
+              ) : (
+                <Link href={href} className="hover:text-base-content/70">
+                  {label}
+                </Link>
+              )}
+            </li>
+          )
         })}
       </ul>
     </nav>
