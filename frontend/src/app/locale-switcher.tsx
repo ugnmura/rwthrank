@@ -3,10 +3,10 @@
 import { useTranslations } from 'next-intl'
 
 import { locales, localeNames } from '@/i18n/config'
-import { useLocaleSwitcher } from './providers'
+import { setStoredLocale, useStoredLocale } from '@/i18n/locale-store'
 
 export function LocaleSwitcher() {
-  const { locale: active, setLocale } = useLocaleSwitcher()
+  const active = useStoredLocale()
   const t = useTranslations('language')
 
   return (
@@ -19,7 +19,7 @@ export function LocaleSwitcher() {
             lang={locale}
             disabled={locale === active}
             aria-current={locale === active ? 'true' : undefined}
-            onClick={() => setLocale(locale)}
+            onClick={() => setStoredLocale(locale)}
             className={
               locale === active
                 ? 'text-base-content/70'
