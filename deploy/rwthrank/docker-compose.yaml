@@ -5,7 +5,7 @@
 # nothing SSHes in to release.
 services:
   rwthrank-backend:
-    image: registry.sushiwaumai.com/rwthrank/backend:latest
+    image: ghcr.io/ugnmura/rwthrank-backend:latest
     container_name: rwthrank-backend
     restart: unless-stopped
     env_file: backend.env

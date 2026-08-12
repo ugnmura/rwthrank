@@ -11,12 +11,20 @@ push to main (frontend/**) ->  Vercel git integration               ->  live
 
 ## One-time: the backend stack
 
-Two GitHub secrets on the repo, so the workflow can push:
+No registry secrets. The image goes to GHCR, which the workflow's own
+`GITHUB_TOKEN` can push to given `packages: write`.
 
-| | |
-|---|---|
-| `REGISTRY_USERNAME` | registry.sushiwaumai.com login |
-| `REGISTRY_PASSWORD` | its password |
+After the very first successful build, make the package public once:
+
+```sh
+gh api -X PATCH /user/packages/container/rwthrank-backend \
+  -f visibility=public
+```
+
+GHCR creates packages private, and a private one means the box needs a pull
+credential. Public is simpler and the repo is public anyway. If you would rather
+keep it private, put a read-only PAT on the box with
+`docker login ghcr.io` instead.
 
 Then on the box:
 
