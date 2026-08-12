@@ -10,6 +10,7 @@
     "typegen": "pocketbase-typegen --db ../backend/pb_data/data.db --out ./src/types/pocketbase.ts"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@tanstack/react-query": "^5.101.4",
     "next": "16.3.0",
     "next-intl": "^4.13.6",

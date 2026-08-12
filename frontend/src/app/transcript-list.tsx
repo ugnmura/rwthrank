@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { useFormatter, useTranslations } from 'next-intl'
+import { TrashIcon } from '@heroicons/react/24/outline'
 
 import { useDeleteTranscript, useTranscripts, type StoredTranscript } from '@/lib/rank'
 
@@ -70,7 +71,7 @@ export function TranscriptList() {
               title={t('delete')}
               className="btn btn-sm btn-ghost text-base-content/50 hover:text-error"
             >
-              <TrashIcon />
+              <TrashIcon className="size-4" />
             </button>
           </li>
         ))}
@@ -113,21 +114,3 @@ export function TranscriptList() {
   )
 }
 
-/** heroicons/outline trash */
-function TrashIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <path d="M14.74 9l-.35 9m-4.78 0L9.26 9m9.97-3.24c.34.05.68.11 1.02.16M18.23 5.76L17.6 19.2a2.25 2.25 0 01-2.25 2.05H8.65a2.25 2.25 0 01-2.25-2.05L5.77 5.76m12.46 0a48.1 48.1 0 00-3.48-.4m-9 .4c.34-.06.68-.11 1.02-.16m0 0a48.1 48.1 0 013.48-.4m3.75 0V3.87c0-.87-.67-1.6-1.54-1.62a49.3 49.3 0 00-2.42 0c-.87.02-1.54.75-1.54 1.62v1.29m5.5 0a48.7 48.7 0 00-5.5 0" />
-    </svg>
-  )
-}
