@@ -38,6 +38,12 @@ export function AuthButton() {
         >
           <li className="menu-title px-3 py-1 text-xs break-all normal-case">{user.email}</li>
           <li>
+            <Link href="/dashboard">{t('dashboard')}</Link>
+          </li>
+          <li>
+            <Link href="/compare">{t('compare')}</Link>
+          </li>
+          <li>
             <Link href="/settings">{t('settings')}</Link>
           </li>
           <li>

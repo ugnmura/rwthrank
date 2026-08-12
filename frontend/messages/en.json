@@ -103,7 +103,8 @@
     "transcripts": "Transcripts",
     "upload": "Upload",
     "account": "Account",
-    "settings": "Settings"
+    "settings": "Settings",
+    "compare": "Compare"
   },
   "legal": {
     "title": "Legal notice and privacy",
@@ -188,5 +189,36 @@
     "confirm2Body": "Type {email} to confirm.",
     "deleteForever": "Delete permanently",
     "deleting": "Deleting"
+  },
+  "compare": {
+    "title": "Compare",
+    "intro": "Choose what the comparison runs over. The average is credit-weighted, the same as your overall grade, and everyone else is measured with the same filter.",
+    "empty": "You have no graded classes matching this selection.",
+    "yourAverage": "Your average",
+    "rank": "Rank",
+    "rankValue": "{rank} of {total}",
+    "top": "Top {percentile} %",
+    "cohortAverage": "Everyone else",
+    "cohortDesc": "same selection",
+    "counted": "Classes counted",
+    "countedDesc": "{credits} credits",
+    "studySemester": "Semester of study",
+    "studySemesterHint": "Defaults to the semester you are in now.",
+    "mySemester": "My current semester",
+    "allSemesters": "All semesters",
+    "nthSemester": "Semester {n}",
+    "calendarSemester": "Calendar semester",
+    "calendarSemesterHint": "A specific one, like 24S or 23W.",
+    "anySemester": "Any",
+    "creditSize": "Only classes worth",
+    "creditSizeHint": "For example only the large modules.",
+    "anyCredits": "Any number of credits",
+    "cpValue": "{credits} credits",
+    "cohort": "Compared against",
+    "cohortHint": "Unchecked compares against every field of study.",
+    "ownProgramOnly": "My field of study and degree only",
+    "classes": "Individual classes",
+    "classesHint": "Pick which classes the average runs over. None selected counts them all.",
+    "clearClasses": "Clear selection"
   }
 }

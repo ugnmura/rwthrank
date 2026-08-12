@@ -103,7 +103,8 @@
     "transcripts": "Notenspiegel",
     "upload": "Hochladen",
     "account": "Konto",
-    "settings": "Einstellungen"
+    "settings": "Einstellungen",
+    "compare": "Vergleichen"
   },
   "legal": {
     "title": "Impressum und Datenschutz",
@@ -188,5 +189,36 @@
     "confirm2Body": "Tipp zur Bestätigung {email} ein.",
     "deleteForever": "Endgültig löschen",
     "deleting": "Wird gelöscht"
+  },
+  "compare": {
+    "title": "Vergleichen",
+    "intro": "Stell dir zusammen, worüber verglichen werden soll. Der Schnitt ist creditgewichtet, genau wie deine Gesamtnote, und alle anderen werden nach demselben Filter gerechnet.",
+    "empty": "Zu dieser Auswahl hast du keine benoteten Fächer.",
+    "yourAverage": "Dein Schnitt",
+    "rank": "Platzierung",
+    "rankValue": "{rank} von {total}",
+    "top": "Top {percentile} %",
+    "cohortAverage": "Schnitt der anderen",
+    "cohortDesc": "gleiche Auswahl",
+    "counted": "Gezählte Fächer",
+    "countedDesc": "{credits} Credits",
+    "studySemester": "Fachsemester",
+    "studySemesterHint": "Standard ist das Semester, in dem du gerade bist.",
+    "mySemester": "Mein aktuelles Semester",
+    "allSemesters": "Alle Semester",
+    "nthSemester": "{n}. Fachsemester",
+    "calendarSemester": "Kalendersemester",
+    "calendarSemesterHint": "Ein bestimmtes Semester wie 24S oder 23W.",
+    "anySemester": "Alle",
+    "creditSize": "Nur Fächer mit",
+    "creditSizeHint": "Zum Beispiel nur die großen Module.",
+    "anyCredits": "Beliebig vielen Credits",
+    "cpValue": "{credits} Credits",
+    "cohort": "Vergleichsgruppe",
+    "cohortHint": "Ohne Haken wird mit allen Fächern verglichen.",
+    "ownProgramOnly": "Nur mein Fach und Abschluss",
+    "classes": "Einzelne Fächer",
+    "classesHint": "Wähl aus, über welche Fächer gerechnet wird. Ohne Auswahl zählen alle.",
+    "clearClasses": "Auswahl aufheben"
   }
 }

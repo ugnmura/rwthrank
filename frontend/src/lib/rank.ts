@@ -274,3 +274,53 @@ export function useCourseRank(course?: string) {
     queryFn: () => call(`/api/rank/course/${course}`) as Promise<CourseRank>,
   })
 }
+
+/** What /api/compare takes. Everything is optional; empty means "no filter". */
+export type CompareFilters = {
+  courses?: string[]
+  semesters?: string[]
+  /** 0 = my current semester, -1 = all of them, n = that semester of study. */
+  studySemester?: number
+  minCredits?: number
+  maxCredits?: number
+  program?: string
+  degree?: string
+}
+
+export type Comparison = {
+  average: number | null
+  credits: number
+  courses: number
+  rank: number | null
+  total: number
+  percentile: number | null
+  cohortAverage: number | null
+}
+
+/** Every class the caller has a result in, for building filters from. */
+export function useMyCourses() {
+  const { data: user } = useAuthRecord()
+
+  return useQuery({
+    queryKey: ['my-courses', user?.id],
+    enabled: Boolean(user),
+    queryFn: () =>
+      pb.collection('results').getFullList({
+        expand: 'course',
+        sort: 'semester',
+      }) as unknown as Promise<Result[]>,
+  })
+}
+
+export function useComparison(filters: CompareFilters) {
+  return useQuery({
+    queryKey: ['compare', filters],
+    queryFn: () =>
+      call('/api/compare', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(filters),
+      }) as Promise<Comparison>,
+    placeholderData: keepPreviousData,
+  })
+}
