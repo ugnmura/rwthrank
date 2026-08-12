@@ -1,17 +1,13 @@
 'use client'
 
-import { useTransition } from 'react'
-import { useLocale, useTranslations } from 'next-intl'
-import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
-import { locales, localeNames, type Locale } from '@/i18n/config'
-import { setUserLocale } from '@/i18n/locale'
+import { locales, localeNames } from '@/i18n/config'
+import { useLocaleSwitcher } from './providers'
 
 export function LocaleSwitcher() {
-  const active = useLocale() as Locale
+  const { locale: active, setLocale } = useLocaleSwitcher()
   const t = useTranslations('language')
-  const router = useRouter()
-  const [pending, startTransition] = useTransition()
 
   return (
     <div className="flex items-center gap-2" aria-label={t('label')}>
@@ -21,16 +17,9 @@ export function LocaleSwitcher() {
           <button
             type="button"
             lang={locale}
-            disabled={pending || locale === active}
+            disabled={locale === active}
             aria-current={locale === active ? 'true' : undefined}
-            onClick={() =>
-              startTransition(async () => {
-                await setUserLocale(locale)
-                // The messages are resolved on the server, so the tree has to
-                // be re-fetched rather than swapped client-side.
-                router.refresh()
-              })
-            }
+            onClick={() => setLocale(locale)}
             className={
               locale === active
                 ? 'text-base-content/70'

@@ -1,6 +1,7 @@
 # Deployed copy of /srv/rwthrank/docker-compose.yaml on the Hetzner box.
 #
-# The frontend is not here: it runs on Vercel and talks to this over HTTPS.
+# The frontend is not here: it is a static export on GitHub Pages at
+# rwthrank.mindevice.net and talks to this over HTTPS.
 # Watchtower pulls :latest whenever the deploy workflow pushes a new image, so
 # nothing SSHes in to release.
 services:
@@ -23,7 +24,7 @@ services:
       - web
     labels:
       - traefik.enable=true
-      - traefik.http.routers.rwthrank-api.rule=Host(`rwthrank.sushiwaumai.com`)
+      - traefik.http.routers.rwthrank-api.rule=Host(`api.rwthrank.mindevice.net`)
       - traefik.http.routers.rwthrank-api.entrypoints=https
       - traefik.http.routers.rwthrank-api.tls=true
       - traefik.http.routers.rwthrank-api.tls.certresolver=letsencrypt

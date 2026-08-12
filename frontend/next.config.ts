@@ -1,11 +1,11 @@
-import createNextIntlPlugin from "next-intl/plugin";
 import type { NextConfig } from "next";
 
-const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
-
 const nextConfig: NextConfig = {
-  // Trims the production image to just the files the server needs.
-  output: "standalone",
+  // GitHub Pages serves files, not a Node server. Everything this app does is
+  // client-side calls to PocketBase, so a static export loses nothing.
+  output: "export",
+  images: { unoptimized: true },
+  trailingSlash: true,
 };
 
-export default withNextIntl(nextConfig);
+export default nextConfig;

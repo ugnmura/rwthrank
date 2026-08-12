@@ -10,7 +10,9 @@ export const localeNames: Record<Locale, string> = {
   en: 'English',
 }
 
-export const LOCALE_COOKIE = 'locale'
+// The site is a static export, so the choice lives in the browser rather
+// than in a cookie a server would read per request.
+export const LOCALE_STORAGE_KEY = 'rwthrank.locale'
 
 export function isLocale(value: unknown): value is Locale {
   return typeof value === 'string' && locales.includes(value as Locale)

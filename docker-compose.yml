@@ -1,5 +1,8 @@
 name: rwthrank
 
+
+# Backend and a mail catcher only. The frontend is a static export served by
+# GitHub Pages, so there is no container for it: run `cd frontend && bun run dev`.
 services:
   # Catches every outgoing email and shows it at http://localhost:8025.
   # Nothing leaves the machine, so real addresses are safe to test with.
@@ -30,9 +33,11 @@ services:
       SMTP_PORT: 1025
       APP_NAME: rwthrank
       APP_URL: http://localhost:${BACKEND_PORT:-8090}
-      # Where the confirmation link points. Without it the email falls back
-      # to the plain code, which this frontend no longer offers a box for.
-      FRONTEND_URL: http://localhost:${FRONTEND_PORT:-3000}
+      # Where the confirmation link points. Run the frontend with
+      # `cd frontend && bun run dev`; it is a static site, not a container.
+      # Without this the email falls back to a plain code and the site has no
+      # box to type one into.
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
       SENDER_NAME: rwthrank
       SENDER_ADDRESS: no-reply@rwthrank.local
     volumes:
@@ -43,27 +48,6 @@ services:
     # Deliberately not --dev: that mode prints codes to the log and skips the
     # send, which would route around Mailpit entirely.
     command: ["serve", "--http=0.0.0.0:8090"]
-
-  frontend:
-    build:
-      context: ./frontend
-      target: dev
-    restart: unless-stopped
-    ports:
-      - "${FRONTEND_PORT:-3000}:3000"
-    environment:
-      # Read by the browser, not by the container, so it points at the published
-      # port rather than the "backend" service name.
-      NEXT_PUBLIC_POCKETBASE_URL: http://localhost:${BACKEND_PORT:-8090}
-      WATCHPACK_POLLING: "true"
-    volumes:
-      - ./frontend:/app
-      # Keep the image's builds of these; the host copies are the wrong libc.
-      - /app/node_modules
-      - /app/.next
-    depends_on:
-      backend:
-        condition: service_healthy
 
 volumes:
   pb_data:
