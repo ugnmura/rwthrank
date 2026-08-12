@@ -41,7 +41,7 @@ export function AuthButton() {
             <Link href="/dashboard">{t('dashboard')}</Link>
           </li>
           <li>
-            <Link href="/compare">{t('compare')}</Link>
+            <Link href="/dashboard/compare">{t('compare')}</Link>
           </li>
           <li>
             <Link href="/settings">{t('settings')}</Link>

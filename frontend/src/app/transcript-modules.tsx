@@ -52,7 +52,7 @@ export function TranscriptModules({ transcript }: { transcript: string }) {
                   reader asked for, falling back when it was never read. */}
               <td>
                 <Link
-                  href={`/compare?course=${row.course}&studySemester=-1`}
+                  href={`/dashboard/compare?course=${row.course}&studySemester=-1`}
                   className="link link-hover"
                   title={t('compareThis')}
                 >

@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useState } from 'react'
+import { useState } from 'react'
 
 import { useRank } from '@/lib/rank'
 import { Dashboard } from '../dashboard'
@@ -9,7 +9,6 @@ import { SignedInOnly } from '../signed-in-only'
 import { SiteHeader } from '../site-header'
 import { TranscriptList } from '../transcript-list'
 import { TranscriptUpload } from '../transcript-upload'
-import { CompareSection } from '../compare-section'
 
 /**
  * Everything you have, on one page: the rank, what it is measured against, the
@@ -43,11 +42,6 @@ export default function DashboardPage() {
 
           <TranscriptUpload />
 
-          {/* Part of the same question, so it sits under the ranking rather
-              than only on a page of its own. */}
-          <Suspense fallback={null}>
-            <CompareSection />
-          </Suspense>
         </main>
       </SignedInOnly>
     </div>

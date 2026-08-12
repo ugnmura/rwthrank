@@ -24,7 +24,7 @@ export function SiteHeader() {
 
   const links = [
     { href: '/dashboard', label: t('dashboard') },
-    { href: '/compare', label: t('compare') },
+    { href: '/dashboard/compare', label: t('compare') },
   ]
 
   return (
@@ -39,9 +39,9 @@ export function SiteHeader() {
             <Link
               key={link.href}
               href={link.href}
-              aria-current={path.startsWith(link.href) ? 'page' : undefined}
+              aria-current={path.replace(/\/$/, '') === link.href ? 'page' : undefined}
               className={
-                path.startsWith(link.href)
+                path.replace(/\/$/, '') === link.href
                   ? 'text-base-content/70'
                   : 'text-base-content/35 underline-offset-4 hover:text-base-content/70 hover:underline'
               }
