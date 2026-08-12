@@ -22,11 +22,7 @@ export function SiteHeader() {
   const path = usePathname()
   const { data: user } = useAuthRecord()
 
-  const links = [
-    { href: '/dashboard', label: t('dashboard') },
-    { href: '/transcripts', label: t('transcripts') },
-    { href: '/upload', label: t('upload') },
-  ]
+  const links = [{ href: '/dashboard', label: t('dashboard') }]
 
   return (
     <header className="mx-auto flex w-full max-w-2xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-6 pt-8 font-mono text-[11px] tracking-[0.18em] uppercase sm:px-10">
