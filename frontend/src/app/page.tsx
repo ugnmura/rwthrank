@@ -23,7 +23,9 @@ export default function Home() {
   // The generated record type has no program or grade yet — see Profile.
   const user = data as Profile | null | undefined
   const [view, setView] = useState<'auto' | 'overall'>('auto')
-  const rank = useRank(view)
+  // Which transcript is being ranked; unset means the newest.
+  const [picked, setPicked] = useState<string>()
+  const rank = useRank(view, picked)
 
   // The account carries nothing to fall back on any more, so the endpoint is
   // the only source: a null grade there means nobody has entered one yet.
@@ -76,7 +78,7 @@ export default function Home() {
             <ScopeFilter view={view} onChange={setView} program={rank.data?.program ?? ''} />
           )}
 
-          <TranscriptList />
+          <TranscriptList selected={rank.data?.transcript ?? undefined} onSelect={setPicked} />
 
           <TranscriptUpload />
         </section>

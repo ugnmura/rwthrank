@@ -17,6 +17,7 @@ export type Profile = UsersResponse
 
 /** `GET /api/rank`. Everything but `total` is null until the user has a grade. */
 export type RankSummary = {
+  transcript: string | null
   /** "program" once a subject and degree are set, "overall" until then. */
   scope: 'program' | 'overall'
   program: string | null
@@ -76,13 +77,19 @@ async function failure(response: Response) {
  * Keyed by user id so a second account on the same browser never reads the
  * first one's cached rank.
  */
-export function useRank(view: 'auto' | 'overall' = 'auto') {
+export function useRank(view: 'auto' | 'overall' = 'auto', transcript?: string) {
   const { data: user } = useAuthRecord()
 
   return useQuery({
-    queryKey: [...rankKey, user?.id, view],
-    queryFn: () =>
-      call(view === 'overall' ? '/api/rank?scope=overall' : '/api/rank') as Promise<RankSummary>,
+    queryKey: [...rankKey, user?.id, view, transcript],
+    queryFn: () => {
+      const params = new URLSearchParams()
+      if (view === 'overall') params.set('scope', 'overall')
+      if (transcript) params.set('transcript', transcript)
+      const query = params.toString()
+
+      return call(query ? `/api/rank?${query}` : '/api/rank') as Promise<RankSummary>
+    },
     enabled: !!user,
   })
 }
@@ -128,6 +135,7 @@ export function useUploadTranscript() {
 /** A stored transcript, as the owner sees it. */
 export type StoredTranscript = {
   id: string
+  issued: string
   program: string
   degree: string
   grade: number
@@ -162,6 +170,24 @@ export function useDeleteTranscript() {
 
   return useMutation({
     mutationFn: (id: string) => pb.collection('transcripts').delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: transcriptsKey })
+      queryClient.invalidateQueries({ queryKey: rankKey })
+    },
+  })
+}
+
+/** Names the programme and degree on a transcript that has none. */
+export function useSetSubject() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, program, degree }: { id: string; program: string; degree: string }) =>
+      call(`/api/transcript/${id}/subject`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ program, degree }),
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: transcriptsKey })
       queryClient.invalidateQueries({ queryKey: rankKey })

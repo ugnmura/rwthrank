@@ -154,6 +154,8 @@
     "deleteOne": "Delete {program}",
     "cancel": "Cancel",
     "confirmTitle": "Delete this transcript?",
-    "confirmBody": "The transcript for {program} and every grade read from it will be deleted. The only way back is uploading the file again."
+    "confirmBody": "The transcript for {program} and every grade read from it will be deleted. The only way back is uploading the file again.",
+    "useThis": "Rank me on this one",
+    "inUse": "Currently shown"
   }
 }

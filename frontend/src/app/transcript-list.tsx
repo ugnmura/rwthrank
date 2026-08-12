@@ -5,6 +5,7 @@ import { useFormatter, useTranslations } from 'next-intl'
 import { TrashIcon } from '@heroicons/react/24/outline'
 
 import { useDeleteTranscript, useTranscripts, type StoredTranscript } from '@/lib/rank'
+import { SubjectPicker } from './subject-picker'
 
 /**
  * The transcripts a user has uploaded, with a way to remove them.
@@ -14,7 +15,13 @@ import { useDeleteTranscript, useTranscripts, type StoredTranscript } from '@/li
  * removes every module read from the document, and nothing can bring those back
  * except uploading the PDF again.
  */
-export function TranscriptList() {
+export function TranscriptList({
+  selected,
+  onSelect,
+}: {
+  selected?: string
+  onSelect: (id: string) => void
+}) {
   const t = useTranslations('transcripts')
   const format = useFormatter()
   const { data: transcripts } = useTranscripts()
@@ -48,8 +55,11 @@ export function TranscriptList() {
         {transcripts.map((item) => (
           <li
             key={item.id}
-            className="flex flex-wrap items-center justify-between gap-3 border border-base-300 px-4 py-3"
+            className={`border px-4 py-3 ${
+              item.id === selected ? 'border-primary' : 'border-base-300'
+            }`}
           >
+            <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="min-w-0">
               <p className="font-medium">
                 {item.program || t('unknownProgram')}
@@ -73,6 +83,25 @@ export function TranscriptList() {
             >
               <TrashIcon className="size-4" />
             </button>
+            </div>
+
+            {/* Only the placeholder a typed grade creates has no subject. */}
+            {!item.program && <SubjectPicker id={item.id} />}
+
+            {/* One subject at a time, so which document is being ranked is a
+                choice rather than always the newest. */}
+            {item.program && item.id !== selected && (
+              <button
+                type="button"
+                onClick={() => onSelect(item.id)}
+                className="link link-hover mt-2 text-xs text-base-content/50"
+              >
+                {t('useThis')}
+              </button>
+            )}
+            {item.id === selected && (
+              <p className="mt-2 text-xs text-primary">{t('inUse')}</p>
+            )}
           </li>
         ))}
       </ul>
