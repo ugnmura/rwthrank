@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 
 import { LocaleSwitcher } from '../locale-switcher'
 import { ThemeSwitcher } from '../theme-switcher'
+import { AuthButton } from '../auth-button'
 
 /**
  * Impressum and Datenschutzerklärung on one page.
@@ -28,6 +29,7 @@ export default function LegalPage() {
         <div className="flex items-baseline gap-4">
           <ThemeSwitcher />
           <LocaleSwitcher />
+          <AuthButton />
         </div>
       </header>
 

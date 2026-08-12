@@ -95,10 +95,14 @@
     "label": "Appearance",
     "system": "System",
     "light": "Light",
-    "dark": "Dark"
+    "dark": "Dark",
+    "toLight": "Switch to light appearance",
+    "toDark": "Switch to dark appearance"
   },
   "nav": {
-    "legal": "Legal notice & privacy"
+    "legal": "Legal notice & privacy",
+    "signIn": "Sign in",
+    "signOut": "Sign out"
   },
   "legal": {
     "title": "Legal notice and privacy",

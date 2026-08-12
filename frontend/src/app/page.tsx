@@ -10,6 +10,7 @@ import Link from 'next/link'
 
 import { LocaleSwitcher } from './locale-switcher'
 import { ThemeSwitcher } from './theme-switcher'
+import { AuthButton } from './auth-button'
 import { RegisterForm } from './register-form'
 import { TranscriptUpload } from './transcript-upload'
 
@@ -33,6 +34,8 @@ export default function Home() {
         <div className="flex items-baseline gap-4">
           <ThemeSwitcher />
           <LocaleSwitcher />
+          <AuthButton />
+          <AuthButton />
         </div>
       </header>
 

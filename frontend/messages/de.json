@@ -95,10 +95,14 @@
     "label": "Darstellung",
     "system": "System",
     "light": "Hell",
-    "dark": "Dunkel"
+    "dark": "Dunkel",
+    "toLight": "Zu hellem Design wechseln",
+    "toDark": "Zu dunklem Design wechseln"
   },
   "nav": {
-    "legal": "Impressum & Datenschutz"
+    "legal": "Impressum & Datenschutz",
+    "signIn": "Anmelden",
+    "signOut": "Abmelden"
   },
   "legal": {
     "title": "Impressum und Datenschutz",
