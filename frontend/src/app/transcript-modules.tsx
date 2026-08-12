@@ -1,7 +1,7 @@
 'use client'
 
 import { Fragment, useState } from 'react'
-import { useFormatter, useTranslations } from 'next-intl'
+import { useFormatter, useLocale, useTranslations } from 'next-intl'
 
 import { useCourseRank, useResults } from '@/lib/rank'
 
@@ -14,6 +14,7 @@ import { useCourseRank, useResults } from '@/lib/rank'
 export function TranscriptModules({ transcript }: { transcript: string }) {
   const t = useTranslations('modules')
   const format = useFormatter()
+  const locale = useLocale()
   const { data: results, isPending } = useResults(transcript)
   // One class open at a time; its standing is only fetched when opened.
   const [openCourse, setOpenCourse] = useState<string>()
@@ -53,7 +54,13 @@ export function TranscriptModules({ transcript }: { transcript: string }) {
               onClick={() => setOpenCourse(openCourse === row.course ? undefined : row.course)}
               className="cursor-pointer hover:bg-base-200"
             >
-              <td>{row.expand?.course?.name ?? '—'}</td>
+              {/* The document names every class twice; show the half the
+                  reader asked for, falling back when it was never read. */}
+              <td>
+                {(locale === 'en' && row.expand?.course?.nameEn) ||
+                  row.expand?.course?.name ||
+                  '—'}
+              </td>
               <td className="tnum text-right">
                 {row.grade ? number(row.grade) : <span title={t('ungradedPass')}>{t('passed')}</span>}
               </td>

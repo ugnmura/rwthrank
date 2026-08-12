@@ -234,7 +234,7 @@ export type Result = {
   passed: boolean
   credits: number | null
   semester: string
-  expand?: { course?: { name: string } }
+  expand?: { course?: { name: string; nameEn: string } }
 }
 
 /**

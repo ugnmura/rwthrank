@@ -86,7 +86,7 @@ func Store(app core.App, userID string, parsed *Transcript, pdf []byte, filename
 		}
 
 		for _, module := range parsed.Modules {
-			courseID, err := courseID(tx, module.Name)
+			courseID, err := courseID(tx, module.Name, module.NameEn)
 			if err != nil {
 				return err
 			}
@@ -119,13 +119,22 @@ func Store(app core.App, userID string, parsed *Transcript, pdf []byte, filename
 // row, which is what makes ranking within one class a lookup rather than a
 // string comparison across the table. The unique index on the name is what
 // keeps that true under concurrent uploads.
-func courseID(tx core.App, name string) (string, error) {
+func courseID(tx core.App, name, nameEn string) (string, error) {
 	existing, err := tx.FindFirstRecordByFilter(
 		coursesCollection,
 		"name = {:name}",
 		dbx.Params{"name": name},
 	)
 	if err == nil {
+		// An older upload may have created the course before the English half
+		// was being read, so fill the gap rather than leaving it empty forever.
+		if nameEn != "" && existing.GetString("nameEn") == "" {
+			existing.Set("nameEn", nameEn)
+			if err := tx.Save(existing); err != nil {
+				return "", err
+			}
+		}
+
 		return existing.Id, nil
 	}
 
@@ -136,6 +145,7 @@ func courseID(tx core.App, name string) (string, error) {
 
 	course := core.NewRecord(courses)
 	course.Set("name", name)
+	course.Set("nameEn", nameEn)
 	if err := tx.Save(course); err != nil {
 		return "", fmt.Errorf("failed to create course %q: %w", name, err)
 	}

@@ -57,7 +57,10 @@ type Transcript struct {
 // Module is one module of the programme, as opposed to a Modulbereich total or
 // a single examination attempt.
 type Module struct {
-	Name     string
+	Name string
+	// NameEn is the same class as the English half names it, empty when that
+	// half is missing or shorter than the German one.
+	NameEn   string
 	Grade    float64 // 0 when ungraded (a "B" pass)
 	Passed   bool
 	Credits  float64
@@ -98,6 +101,14 @@ const (
 	// It is also the marker that the German half of the document has started.
 	tableHeader = "Module/Fächer"
 
+	// englishTableHeader introduces the same table in the English half. RWTH
+	// prints every Notenspiegel twice, the second time translated, so the
+	// English name of every class is already in the document.
+	englishTableHeader = "Modules/Courses"
+
+	// englishProgramLabel is the English half's version of programLabel.
+	englishProgramLabel = "Course of Study:"
+
 	// programLabel labels the field whose value line carries the programme.
 	programLabel = "Studiengang:"
 
@@ -126,12 +137,16 @@ var (
 // parseLines walks the document top to bottom and collects the grade table.
 func parseLines(lines []Line) (*Transcript, error) {
 	var (
-		t           Transcript
-		rows        []tableRow
-		page        int
-		inTable     bool
-		wantProgram bool
-		lastY       float64
+		t                  Transcript
+		rows               []tableRow
+		page               int
+		inTable            bool
+		wantProgram        bool
+		wantEnglishProgram bool
+		inEnglish          bool
+		englishProgram     string
+		englishRows        []tableRow
+		lastY              float64
 	)
 
 	for _, line := range lines {
@@ -173,6 +188,19 @@ func parseLines(lines []Line) (*Transcript, error) {
 			inTable = true
 			continue
 
+		case first == englishTableHeader:
+			// Everything from here is the translated copy of the same table.
+			inTable, inEnglish = true, true
+			continue
+
+		case wantEnglishProgram:
+			englishProgram, wantEnglishProgram = first, false
+			continue
+
+		case englishProgram == "" && strings.HasPrefix(first, englishProgramLabel):
+			wantEnglishProgram = true
+			continue
+
 		case creditsSummaryRe.MatchString(first):
 			m := creditsSummaryRe.FindStringSubmatch(first)
 			t.Credits, t.MaxCredits = decimal(m[1]), decimal(m[2])
@@ -189,17 +217,28 @@ func parseLines(lines []Line) (*Transcript, error) {
 		}
 
 		// A name too long for its column wraps onto a line of its own.
-		if len(line.Cells) == 1 && len(rows) > 0 && lastY-line.Y > 0 && lastY-line.Y <= continuationGap {
-			rows[len(rows)-1].name += " " + first
-			lastY = line.Y
-			continue
+		if len(line.Cells) == 1 && lastY-line.Y > 0 && lastY-line.Y <= continuationGap {
+			if inEnglish && len(englishRows) > 0 {
+				englishRows[len(englishRows)-1].name += " " + first
+				lastY = line.Y
+				continue
+			}
+			if !inEnglish && len(rows) > 0 {
+				rows[len(rows)-1].name += " " + first
+				lastY = line.Y
+				continue
+			}
 		}
 
 		row, ok := parseRow(line.Cells)
 		if !ok || (row.ang == "" && row.date == "") {
 			continue // page numbers and other stray text between the rows
 		}
-		rows = append(rows, row)
+		if inEnglish {
+			englishRows = append(englishRows, row)
+		} else {
+			rows = append(rows, row)
+		}
 		lastY = line.Y
 	}
 
@@ -227,6 +266,16 @@ func parseLines(lines []Line) (*Transcript, error) {
 
 	t.Modules = modules(rows, t.Program)
 
+	// The English half is the same table translated, printed in the same order,
+	// so the nth class in one is the nth in the other. Names are paired by
+	// position rather than matched on anything, because nothing in a translated
+	// name is stable enough to match on.
+	if english := modules(englishRows, englishProgram); len(english) == len(t.Modules) {
+		for i := range t.Modules {
+			t.Modules[i].NameEn = english[i].Name
+		}
+	}
+
 	return &t, nil
 }
 
@@ -249,15 +298,20 @@ func (r tableRow) attempt() bool { return r.vm != "" }
 // that could belong to it. Marks are matched before the "angerechnete Leistung"
 // flag because "N" alone is not a Vermerk, and grades before credits because
 // only credits are printed with two decimals.
+//
+// Every numeric pattern accepts both notations: the document prints the same
+// table twice, German with decimal commas and English with decimal points.
 var columns = []struct {
 	field func(*tableRow) *string
 	match func(string) bool
 }{
-	{func(r *tableRow) *string { return &r.note }, regexp.MustCompile(`^([1-5],\d|B|Q)$`).MatchString},
+	{func(r *tableRow) *string { return &r.note }, regexp.MustCompile(`^([1-5][,.]\d|B|Q)$`).MatchString},
 	{func(r *tableRow) *string { return &r.vm }, isVermerk},
 	{func(r *tableRow) *string { return &r.ang }, regexp.MustCompile(`^[JNT]$`).MatchString},
-	{func(r *tableRow) *string { return &r.credits }, regexp.MustCompile(`^\d{1,3}(\.\d{3})*,\d{2}$`).MatchString},
-	{func(r *tableRow) *string { return &r.date }, regexp.MustCompile(`^\d{2}\.\d{2}\.\d{4}$`).MatchString},
+	{func(r *tableRow) *string { return &r.credits }, regexp.MustCompile(`^(\d{1,3}(\.\d{3})*,\d{2}|\d{1,3}(,\d{3})*\.\d{2})$`).MatchString},
+	// Both notations: the German half prints 07.02.2024 and the English
+	// half the same day as 2024-02-07.
+	{func(r *tableRow) *string { return &r.date }, regexp.MustCompile(`^(\d{2}\.\d{2}\.\d{4}|\d{4}-\d{2}-\d{2})$`).MatchString},
 	{func(r *tableRow) *string { return &r.semester }, regexp.MustCompile(`^\d{2}[WS]$`).MatchString},
 }
 
@@ -403,8 +457,18 @@ func isTotal(rows []tableRow, i int, program string) bool {
 // decimal reads a German-formatted number: comma for the decimal point, dot for
 // thousands. Anything unparsable — "B", "Q", an empty cell — reads as 0.
 func decimal(s string) float64 {
-	s = strings.ReplaceAll(strings.TrimSpace(s), ".", "")
-	s = strings.ReplaceAll(s, ",", ".")
+	s = strings.TrimSpace(s)
+
+	// The same number is printed both ways: 1.024,00 in the German half and
+	// 1,024.00 in the English one. Whichever separator comes last is the
+	// decimal point, and the other is grouping.
+	if strings.LastIndex(s, ",") > strings.LastIndex(s, ".") {
+		s = strings.ReplaceAll(s, ".", "")
+		s = strings.ReplaceAll(s, ",", ".")
+	} else {
+		s = strings.ReplaceAll(s, ",", "")
+	}
+
 	v, err := strconv.ParseFloat(s, 64)
 	if err != nil {
 		return 0
