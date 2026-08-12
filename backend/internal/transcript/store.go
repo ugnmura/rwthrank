@@ -51,9 +51,12 @@ func Store(app core.App, userID string, parsed *Transcript, pdf []byte, filename
 		record.Set("issued", parsed.Issued)
 		record.Set("program", parsed.Program)
 		record.Set("degree", parsed.Degree)
-		record.Set("grade", parsed.Grade)
-		record.Set("credits", parsed.Credits)
-		record.Set("maxCredits", parsed.MaxCredits)
+		// Left unset rather than zeroed when the document does not say. Zero is
+		// not a grade at all, and zero credits is a real answer that must stay
+		// distinguishable from an absent one.
+		setNumber(record, "grade", parsed.Grade)
+		setNumber(record, "credits", parsed.Credits)
+		setNumber(record, "maxCredits", parsed.MaxCredits)
 
 		if len(pdf) > 0 {
 			file, err := filesystem.NewFileFromBytes(pdf, filename)
@@ -83,9 +86,11 @@ func Store(app core.App, userID string, parsed *Transcript, pdf []byte, filename
 			row.Set("transcript", record.Id)
 			row.Set("course", courseID)
 			row.Set("user", userID)
-			row.Set("grade", module.Grade)
+			// A module passed without a grade — the German "B" — has no number
+			// to record, so the column stays NULL instead of claiming a 0.
+			setNumber(row, "grade", module.Grade)
 			row.Set("passed", module.Passed)
-			row.Set("credits", module.Credits)
+			setNumber(row, "credits", module.Credits)
 			row.Set("semester", module.Semester)
 
 			if err := tx.Save(row); err != nil {
@@ -150,4 +155,13 @@ func sameSubject(tx core.App, userID, program, degree string) (*core.Record, err
 	}
 
 	return found[0], nil
+}
+
+// setNumber writes a number only when the document actually stated one.
+func setNumber(record *core.Record, field string, value float64) {
+	if value <= 0 {
+		return
+	}
+
+	record.Set(field, value)
 }

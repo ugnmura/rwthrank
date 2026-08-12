@@ -60,6 +60,9 @@ func handleRank(e *core.RequestEvent) error {
 
 	program := mine.GetString("program")
 	degree := mine.GetString("degree")
+	// NULL rather than zero means "no grade", so the raw value is what tells
+	// them apart: GetFloat would flatten both to 0.
+	graded := mine.Get("grade") != nil
 	grade := mine.GetFloat("grade")
 
 	// ?scope=overall looks at everyone without discarding the programme, so
@@ -71,8 +74,7 @@ func handleRank(e *core.RequestEvent) error {
 		return e.InternalServerError("Failed to count the cohort.", err)
 	}
 
-	// Grades are constrained to 1.0-5.0, so 0 is unreachable for a real one.
-	if grade == 0 {
+	if !graded {
 		empty := &response{Scope: scopeName(scoped), Transcript: &mine.Id, Total: total}
 		if program != "" {
 			empty.Program, empty.Degree = &program, &degree
@@ -157,7 +159,7 @@ func count(app core.App, program, degree string, scoped bool, better float64) (i
 	query := app.DB().
 		Select("COUNT(*)").
 		From("transcripts t").
-		Where(dbx.NewExp("t.grade > 0")).
+		Where(dbx.NewExp("t.grade IS NOT NULL")).
 		AndWhere(dbx.NewExp(latestPerPerson(scoped)))
 
 	if scoped {
