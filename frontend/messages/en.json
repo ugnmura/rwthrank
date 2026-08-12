@@ -4,31 +4,88 @@
   },
   "hero": {
     "title": "Compare your transcript",
-    "subtitle": "Upload your transcript and see where you stand right away."
+    "subtitle": "Three entries, then you see your rank in your own subject.",
+    "subtitleSignedIn": "Subject and grade are still missing. Then you see your rank."
   },
   "form": {
+    "legend": "Register",
+    "legendSignedIn": "Subject and grade",
     "emailLabel": "Email",
     "emailPlaceholder": "ab123456@rwth-aachen.de",
-    "sendCode": "Send code",
+    "programLabel": "Subject",
+    "programPlaceholder": "Pick a subject",
+    "gradeLabel": "Grade",
+    "gradePlaceholder": "Pick a grade",
+    "register": "Register",
+    "registerHint": "You get an 8-digit code by email. No password.",
     "sending": "Sending",
+    "save": "Save",
+    "saving": "Saving",
     "codeLabel": "8-digit code",
     "codePlaceholder": "12345678",
     "codeSentTo": "Code sent to {email}. Valid for 5 minutes.",
     "signIn": "Sign in",
     "checking": "Checking",
-    "otherAddress": "Different email"
+    "otherAddress": "Different email",
+    "reveal": "Show my rank",
+    "gradeInvalid": "Enter a grade between 1.0 and 5.0.",
+    "sentLabel": "Email on its way",
+    "sentBody": "Open the link in the email and you'll see your rank. The link is good for five minutes."
   },
   "signedIn": {
     "label": "Signed in",
-    "next": "Upload is coming soon.",
     "signOut": "Sign out"
+  },
+  "dashboard": {
+    "label": "Your rank",
+    "place": "Rank {rank} of {total}",
+    "scope": "The comparison stays inside {program}. Other subjects are not counted.",
+    "topLabel": "Top",
+    "topValue": "{percentile} %",
+    "topDesc": "in {program}",
+    "gradeLabel": "Your grade",
+    "gradeDesc": "from your profile",
+    "totalLabel": "Compared with",
+    "totalDesc": "grades in {program}",
+    "loading": "Loading your rank",
+    "error": "Your rank cannot be loaded right now.",
+    "retry": "Try again"
+  },
+  "upload": {
+    "title": "Upload your transcript",
+    "hint": "PDF from RWTHonline. Subject, grade, credits and the number of modules are read out of it.",
+    "legend": "File",
+    "privacy": "The file is read and then discarded. It is not stored.",
+    "submit": "Upload",
+    "reading": "Reading",
+    "error": "The file could not be read.",
+    "resultTitle": "What the file says",
+    "program": "Subject",
+    "grade": "Grade",
+    "credits": "Credits",
+    "creditsValue": "{credits} of {maxCredits}",
+    "modules": "Modules",
+    "apply": "Apply subject and grade",
+    "applying": "Applying",
+    "applied": "Applied. Your rank is up to date."
   },
   "curve": {
     "alt": "Distribution of grades from 1.0 to 5.0. The largest share is at 2.3.",
     "you": "you",
-    "caption": "Sample data, not real grades. Your line appears right after the upload."
+    "caption": "Sample data, not real grades. Your own grade is not drawn in here yet."
   },
   "language": {
     "label": "Language"
+  },
+  "verify": {
+    "checking": "Confirming your email",
+    "confirmedTitle": "Email confirmed.",
+    "confirmedBody": "Your subject and grade are saved.",
+    "seeRank": "See my rank",
+    "failedTitle": "That link didn't work.",
+    "failedBody": "Links last five minutes and work once.",
+    "linkIncomplete": "The link is missing something. Request a new email.",
+    "linkFailed": "The link has expired or was already used.",
+    "startOver": "Start over"
   }
 }

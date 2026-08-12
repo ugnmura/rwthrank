@@ -10,6 +10,8 @@ package auth
 
 import (
 	"fmt"
+	"net/url"
+	"os"
 	"strings"
 
 	"github.com/pocketbase/pocketbase"
@@ -23,8 +25,48 @@ const usersCollection = "users"
 // RegisterOTP installs the hooks that turn request-otp into a combined
 // sign-up/sign-in endpoint.
 func RegisterOTP(app *pocketbase.PocketBase) {
+	sendMagicLink(app)
 	printOTPInDev(app)
 	createAccountOnFirstOTP(app)
+}
+
+// sendMagicLink replaces the code email with a single confirmation link.
+//
+// The code itself still exists and still expires — the link just carries it, so
+// nobody has to copy eight digits between two windows. Nothing about the auth
+// changes: the landing page redeems the pair against auth-with-otp exactly as a
+// typed code would.
+//
+// FRONTEND_URL has to be set, because the link points at the site rather than at
+// this API. Without it the stock code email goes out unchanged, which keeps a
+// misconfigured deployment usable instead of sending links to nowhere.
+func sendMagicLink(app *pocketbase.PocketBase) {
+	app.OnMailerRecordOTPSend(usersCollection).BindFunc(func(e *core.MailerRecordEvent) error {
+		base := strings.TrimSuffix(os.Getenv("FRONTEND_URL"), "/")
+		if base == "" {
+			return e.Next()
+		}
+
+		otpID, _ := e.Meta["otpId"].(string)
+		code, _ := e.Meta["password"].(string)
+		if otpID == "" || code == "" {
+			return e.Next()
+		}
+
+		link := fmt.Sprintf("%s/verify?id=%s&code=%s",
+			base, url.QueryEscape(otpID), url.QueryEscape(code))
+
+		// German only for now: the request carries no locale, and the audience
+		// reads German. Worth threading a locale through when that stops holding.
+		e.Message.Subject = "Deine Platzierung bei rwthrank"
+		e.Message.HTML = fmt.Sprintf(`<p>Hallo,</p>
+<p>klick auf den Link, um deine E-Mail zu bestätigen und deine Platzierung zu sehen.</p>
+<p><a href="%s">Platzierung ansehen</a></p>
+<p>Der Link ist fünf Minuten gültig und funktioniert einmal.</p>
+<p>Wenn du das nicht warst, kannst du diese E-Mail ignorieren.</p>`, link)
+
+		return e.Next()
+	})
 }
 
 // createAccountOnFirstOTP lets an unknown email request a code and get an account.

@@ -30,6 +30,9 @@ services:
       SMTP_PORT: 1025
       APP_NAME: rwthrank
       APP_URL: http://localhost:${BACKEND_PORT:-8090}
+      # Where the confirmation link points. Without it the email falls back
+      # to the plain code, which this frontend no longer offers a box for.
+      FRONTEND_URL: http://localhost:${FRONTEND_PORT:-3000}
       SENDER_NAME: rwthrank
       SENDER_ADDRESS: no-reply@rwthrank.local
     volumes:

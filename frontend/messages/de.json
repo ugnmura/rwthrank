@@ -4,31 +4,88 @@
   },
   "hero": {
     "title": "Notenspiegel vergleichen",
-    "subtitle": "Lade deinen Notenspiegel hoch und sieh sofort, wo du im Vergleich liegst."
+    "subtitle": "Drei Angaben, dann siehst du deinen Platz in deinem Fach.",
+    "subtitleSignedIn": "Fach und Note fehlen noch. Danach siehst du deinen Platz."
   },
   "form": {
+    "legend": "Registrieren",
+    "legendSignedIn": "Fach und Note",
     "emailLabel": "E-Mail",
     "emailPlaceholder": "ab123456@rwth-aachen.de",
-    "sendCode": "Code schicken",
+    "programLabel": "Fach",
+    "programPlaceholder": "Fach wählen",
+    "gradeLabel": "Note",
+    "gradePlaceholder": "Note wählen",
+    "register": "Registrieren",
+    "registerHint": "Du bekommst einen 8-stelligen Code per E-Mail. Kein Passwort.",
     "sending": "Wird geschickt",
+    "save": "Speichern",
+    "saving": "Wird gespeichert",
     "codeLabel": "8-stelliger Code",
     "codePlaceholder": "12345678",
     "codeSentTo": "Code an {email} geschickt. Gültig für 5 Minuten.",
     "signIn": "Anmelden",
     "checking": "Wird geprüft",
-    "otherAddress": "Andere E-Mail"
+    "otherAddress": "Andere E-Mail",
+    "reveal": "Platzierung anzeigen",
+    "gradeInvalid": "Bitte eine Note zwischen 1,0 und 5,0 eintragen.",
+    "sentLabel": "E-Mail unterwegs",
+    "sentBody": "Klick den Link in der E-Mail, dann siehst du deine Platzierung. Der Link gilt fünf Minuten."
   },
   "signedIn": {
     "label": "Angemeldet",
-    "next": "Der Upload kommt bald.",
     "signOut": "Abmelden"
+  },
+  "dashboard": {
+    "label": "Deine Platzierung",
+    "place": "Platz {rank} von {total}",
+    "scope": "Verglichen wird nur innerhalb von {program}. Andere Fächer zählen nicht mit.",
+    "topLabel": "Top",
+    "topValue": "{percentile} %",
+    "topDesc": "in {program}",
+    "gradeLabel": "Deine Note",
+    "gradeDesc": "aus deinem Profil",
+    "totalLabel": "Verglichen mit",
+    "totalDesc": "Noten in {program}",
+    "loading": "Platzierung wird geladen",
+    "error": "Die Platzierung lässt sich gerade nicht laden.",
+    "retry": "Nochmal versuchen"
+  },
+  "upload": {
+    "title": "Notenspiegel hochladen",
+    "hint": "PDF aus RWTHonline. Ausgelesen werden Fach, Note, Credits und Anzahl der Module.",
+    "legend": "Datei",
+    "privacy": "Die Datei wird gelesen und danach verworfen. Gespeichert wird sie nicht.",
+    "submit": "Hochladen",
+    "reading": "Wird gelesen",
+    "error": "Die Datei konnte nicht gelesen werden.",
+    "resultTitle": "Das steht in der Datei",
+    "program": "Fach",
+    "grade": "Note",
+    "credits": "Credits",
+    "creditsValue": "{credits} von {maxCredits}",
+    "modules": "Module",
+    "apply": "Fach und Note übernehmen",
+    "applying": "Wird übernommen",
+    "applied": "Übernommen. Deine Platzierung ist aktualisiert."
   },
   "curve": {
     "alt": "Verteilung der Noten von 1,0 bis 5,0. Der größte Anteil liegt bei 2,3.",
     "you": "du",
-    "caption": "Beispieldaten, keine echten Noten. Deine Linie erscheint direkt nach dem Upload."
+    "caption": "Beispieldaten, keine echten Noten. Deine eigene Note ist hier noch nicht eingezeichnet."
   },
   "language": {
     "label": "Sprache"
+  },
+  "verify": {
+    "checking": "E-Mail wird bestätigt",
+    "confirmedTitle": "E-Mail bestätigt.",
+    "confirmedBody": "Fach und Note sind gespeichert.",
+    "seeRank": "Platzierung ansehen",
+    "failedTitle": "Der Link hat nicht funktioniert.",
+    "failedBody": "Links gelten fünf Minuten und lassen sich einmal benutzen.",
+    "linkIncomplete": "Dem Link fehlt etwas. Fordere eine neue E-Mail an.",
+    "linkFailed": "Der Link ist abgelaufen oder wurde schon benutzt.",
+    "startOver": "Neu anfangen"
   }
 }
