@@ -6,6 +6,15 @@ import { defaultLocale } from "@/i18n/config";
 export const metadata: Metadata = {
   title: "rwthrank",
   description: "Notenspiegel vergleichen. Anmeldung per Code, kein Passwort.",
+  // Two marks, picked by the browser from the operating system's setting. A tab
+  // strip is dark long before anything on the page is, and one icon cannot sit
+  // on both grounds without going muddy on one of them.
+  icons: {
+    icon: [
+      { url: "/icon-light.svg", media: "(prefers-color-scheme: light)" },
+      { url: "/icon-dark.svg", media: "(prefers-color-scheme: dark)" },
+    ],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

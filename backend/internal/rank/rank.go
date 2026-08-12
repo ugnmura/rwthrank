@@ -37,6 +37,7 @@ func RegisterRoutes(app *pocketbase.PocketBase) {
 		se.Router.GET("/api/rank", handleRank).Bind(apis.RequireAuth())
 		registerCourseRoute(se)
 		registerCompareRoute(se)
+		registerOptionsRoute(se)
 
 		return se.Next()
 	})

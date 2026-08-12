@@ -105,7 +105,8 @@
     "account": "Account",
     "settings": "Settings",
     "compare": "Compare",
-    "verify": "Confirmation"
+    "verify": "Confirmation",
+    "menu": "Menu"
   },
   "legal": {
     "title": "Legal notice and privacy",
@@ -216,7 +217,18 @@
     "official": "Overall grade as printed on your transcript",
     "computed": "Computed from the classes you selected",
     "cohortMedian": "Median",
-    "medianDesc": "the grade in the middle"
+    "medianDesc": "the grade in the middle",
+    "placeLabel": "Your rank",
+    "place": "Rank {rank} of {total}",
+    "placeDesc": "among everyone with the same selection",
+    "officialShort": "as printed on your transcript",
+    "computedShort": "from your selection",
+    "emptyCohort": "Nobody has a grade in this selection yet.",
+    "notMine": "You have no graded classes in this selection. A rank appears once you have a grade of your own in it.",
+    "people": "People compared",
+    "peopleDesc": "with this selection",
+    "anySemesterHint": "Including semesters you have not sat yet.",
+    "emptyShort": "no graded classes here"
   },
   "login": {
     "title": "Sign in",

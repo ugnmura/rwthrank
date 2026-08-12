@@ -3,6 +3,7 @@
 import { useFormatter, useTranslations } from 'next-intl'
 
 import { useRank } from '@/lib/rank'
+import { Stat, StatGrid } from './stat-grid'
 
 /**
  * Where the user stands: against everyone by default, or inside their own
@@ -77,27 +78,20 @@ export function Dashboard({
         {data.scope === 'program' ? t('scope', { program: data.program ?? '' }) : t('scopeOverall')}
       </p>
 
-      <div className="stats stats-vertical mt-8 w-full bg-base-200/60 sm:stats-horizontal">
-        <div className="stat">
-          <div className="stat-title">{t('topLabel')}</div>
-          <div className="stat-value tnum text-secondary">
-            {t('topValue', { percentile: percent(data.percentile) })}
-          </div>
-          <div className="stat-desc">{data.scope === 'program' ? t('topDesc', { program: data.program ?? '' }) : t('statOverall')}</div>
-        </div>
-
-        <div className="stat">
-          <div className="stat-title">{t('gradeLabel')}</div>
-          <div className="stat-value tnum">{grade(data.grade)}</div>
-          <div className="stat-desc">{t('gradeDesc')}</div>
-        </div>
-
-        <div className="stat">
-          <div className="stat-title">{t('totalLabel')}</div>
-          <div className="stat-value tnum">{format.number(data.total)}</div>
-          <div className="stat-desc">{data.scope === 'program' ? t('totalDesc', { program: data.program ?? '' }) : t('statOverall')}</div>
-        </div>
-      </div>
+      <StatGrid columns="three" className="mt-8">
+        <Stat
+          label={t('topLabel')}
+          value={t('topValue', { percentile: percent(data.percentile) })}
+          hint={data.scope === 'program' ? t('topDesc', { program: data.program ?? '' }) : t('statOverall')}
+          tone="accent"
+        />
+        <Stat label={t('gradeLabel')} value={grade(data.grade)} hint={t('gradeDesc')} />
+        <Stat
+          label={t('totalLabel')}
+          value={format.number(data.total)}
+          hint={data.scope === 'program' ? t('totalDesc', { program: data.program ?? '' }) : t('statOverall')}
+        />
+      </StatGrid>
     </div>
   )
 }

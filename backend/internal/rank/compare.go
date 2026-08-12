@@ -104,16 +104,19 @@ func handleCompare(e *core.RequestEvent) error {
 	for k, v := range params {
 		mineParams[k] = v
 	}
-	err := e.App.DB().
-		NewQuery("SELECT avg, credits, courses FROM (" + averages + ") a WHERE a.user = {:me}").
+	// No row means the filter picks nothing the caller has. That is a question
+	// worth answering rather than an empty screen: a semester they have not
+	// reached yet still has other people in it, and what those people scored is
+	// the reason to ask about it at all. Everything below runs either way; only
+	// the placement needs a grade of one's own.
+	hasMine := e.App.DB().
+		NewQuery("SELECT avg, credits, courses FROM ("+averages+") a WHERE a.user = {:me}").
 		Bind(mineParams).
-		One(&mine)
-	if err != nil {
-		// No rows means the filters exclude everything the caller has.
-		return e.JSON(http.StatusOK, out)
-	}
+		One(&mine) == nil
 
-	out.Average, out.Credits, out.Courses = &mine.Avg, mine.Credits, mine.Courses
+	if hasMine {
+		out.Average, out.Credits, out.Courses = &mine.Avg, mine.Credits, mine.Courses
+	}
 
 	var totals struct {
 		Total  int64   `db:"total"`
@@ -124,10 +127,12 @@ func handleCompare(e *core.RequestEvent) error {
 	for k, v := range params {
 		cohortParams[k] = v
 	}
-	err = e.App.DB().
+	err := e.App.DB().
+		// COALESCE because a filter matching nobody makes SUM and AVG return
+		// NULL over the empty set, and a null does not scan into a number.
 		NewQuery(`SELECT COUNT(*) AS total,
-		                 SUM(CASE WHEN a.avg < {:mine} THEN 1 ELSE 0 END) AS better,
-		                 AVG(a.avg) AS cohort
+		                 COALESCE(SUM(CASE WHEN a.avg < {:mine} THEN 1 ELSE 0 END), 0) AS better,
+		                 COALESCE(AVG(a.avg), 0) AS cohort
 		          FROM (` + averages + `) a`).
 		Bind(cohortParams).
 		One(&totals)
@@ -135,15 +140,22 @@ func handleCompare(e *core.RequestEvent) error {
 		return e.InternalServerError("Failed to compare.", err)
 	}
 
-	rank := totals.Better + 1
-	percentile := math.Round(float64(rank)/float64(totals.Total)*1000) / 10
+	out.Total = totals.Total
+	if totals.Total > 0 {
+		out.CohortAverage = &totals.Cohort
+	}
 
-	out.Rank, out.Total, out.Percentile = &rank, totals.Total, &percentile
-	out.CohortAverage = &totals.Cohort
+	if hasMine {
+		rank := totals.Better + 1
+		percentile := math.Round(float64(rank)/float64(totals.Total)*1000) / 10
+		out.Rank, out.Percentile = &rank, &percentile
+	}
 
-	stats, err := statsOver(e.App, "SELECT a.avg AS value FROM ("+averages+") a", params)
-	if err == nil {
-		out.CohortMedian = &stats.Median
+	if totals.Total > 0 {
+		stats, err := statsOver(e.App, "SELECT a.avg AS value FROM ("+averages+") a", params)
+		if err == nil {
+			out.CohortMedian = &stats.Median
+		}
 	}
 
 	return e.JSON(http.StatusOK, out)
@@ -258,6 +270,16 @@ func officialAverage(e *core.RequestEvent) error {
 		return e.JSON(http.StatusOK, &compareResponse{Credits: credits})
 	}
 
+	// The printed grade is not computed from the module rows, but the rows are
+	// still what it covers, so the count belongs with it. Without this the
+	// unfiltered view claims nought classes next to a full credit total.
+	var counted int
+	e.App.DB().
+		NewQuery(`SELECT COUNT(*) FROM results
+		          WHERE transcript = {:transcript} AND grade IS NOT NULL`).
+		Bind(dbx.Params{"transcript": mine.Id}).
+		Row(&counted)
+
 	var totals struct {
 		Total  int64   `db:"total"`
 		Better int64   `db:"better"`
@@ -282,6 +304,7 @@ func officialAverage(e *core.RequestEvent) error {
 	result := &compareResponse{
 		Average:       &grade,
 		Credits:       credits,
+		Courses:       counted,
 		Official:      true,
 		Rank:          &rank,
 		Total:         totals.Total,

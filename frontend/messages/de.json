@@ -105,7 +105,8 @@
     "account": "Konto",
     "settings": "Einstellungen",
     "compare": "Vergleichen",
-    "verify": "Bestätigung"
+    "verify": "Bestätigung",
+    "menu": "Menü"
   },
   "legal": {
     "title": "Impressum und Datenschutz",
@@ -216,7 +217,18 @@
     "official": "Gesamtnote laut Notenspiegel",
     "computed": "Aus den ausgewählten Fächern berechnet",
     "cohortMedian": "Median",
-    "medianDesc": "die Note in der Mitte"
+    "medianDesc": "die Note in der Mitte",
+    "placeLabel": "Deine Platzierung",
+    "place": "Platz {rank} von {total}",
+    "placeDesc": "unter allen, die dieselbe Auswahl haben",
+    "officialShort": "laut Notenspiegel",
+    "computedShort": "aus deiner Auswahl",
+    "emptyCohort": "Zu dieser Auswahl gibt es noch keine Noten.",
+    "notMine": "Du hast in dieser Auswahl keine benoteten Fächer. Deine Platzierung gibt es erst, wenn du selbst eine Note darin hast.",
+    "people": "Verglichene Personen",
+    "peopleDesc": "mit dieser Auswahl",
+    "anySemesterHint": "Auch Semester, die du noch nicht hattest.",
+    "emptyShort": "keine benoteten Fächer"
   },
   "login": {
     "title": "Anmelden",

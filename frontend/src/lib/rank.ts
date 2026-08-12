@@ -316,6 +316,24 @@ export function useMyCourses() {
   })
 }
 
+/**
+ * Every semester anyone has a result in.
+ *
+ * Not only the caller's own: the semester you have not sat yet is one of the
+ * ones worth asking about, and a list built from your transcript alone cannot
+ * offer it.
+ */
+export function useCompareOptions() {
+  const { data: user } = useAuthRecord()
+
+  return useQuery({
+    queryKey: ['compare-options'],
+    enabled: Boolean(user),
+    queryFn: () => call('/api/compare/options') as Promise<{ semesters: string[] }>,
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
 export function useComparison(filters: CompareFilters) {
   return useQuery({
     queryKey: ['compare', filters],

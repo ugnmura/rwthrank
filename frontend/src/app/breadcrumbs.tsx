@@ -26,7 +26,7 @@ export function Breadcrumbs() {
   }
 
   return (
-    <nav className="breadcrumbs mx-auto w-full max-w-2xl px-6 pt-2 pb-0 text-xs text-base-content/60 sm:px-10">
+    <nav className="breadcrumbs mx-auto w-full max-w-2xl px-6 pt-1.5 pb-0 text-xs text-base-content/60 sm:px-10">
       <ul>
         <li>
           <Link href="/" className="hover:text-base-content">rwthrank</Link>

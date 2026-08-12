@@ -4,7 +4,13 @@ import { useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useFormatter, useLocale, useTranslations } from 'next-intl'
 
-import { useComparison, useMyCourses, type CompareFilters } from '@/lib/rank'
+import {
+  useComparison,
+  useCompareOptions,
+  useMyCourses,
+  type CompareFilters,
+} from '@/lib/rank'
+import { Stat, StatGrid } from './stat-grid'
 
 /**
  * Compare yourself over exactly the classes you choose.
@@ -20,6 +26,7 @@ export function CompareSection() {
   const locale = useLocale()
 
   const { data: results } = useMyCourses()
+  const { data: options } = useCompareOptions()
 
   // Opened from a class on the dashboard, the page starts on that class rather
   // than making the reader find it again in the list below.
@@ -27,9 +34,11 @@ export function CompareSection() {
   const [semester, setSemester] = useState(params.get('semester') ?? '')
   const [picked, setPicked] = useState<string[]>(params.getAll('course'))
 
-  // Built from what the person actually has, so no filter can select nothing.
+  // Classes are the caller's own — comparing over a class you never sat has no
+  // answer — but the semesters are everyone's, so a semester you have not
+  // reached yet can still be looked at.
   const { semesters, courses } = useMemo(() => {
-    const sem = new Set<string>()
+    const sem = new Set<string>(options?.semesters ?? [])
     const byCourse = new Map<string, string>()
 
     for (const row of results ?? []) {
@@ -43,7 +52,7 @@ export function CompareSection() {
       semesters: [...sem].sort(),
       courses: [...byCourse].map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name)),
     }
-  }, [results, locale])
+  }, [results, options, locale])
 
   const filters: CompareFilters = {
     // Always every semester: the page does not offer to narrow by one.
@@ -71,61 +80,84 @@ export function CompareSection() {
           {/* The answer sits above the controls, so changing one shows its
               effect without scrolling. */}
           <section className={isFetching ? 'opacity-60 transition-opacity' : undefined}>
-            {data?.average == null ? (
-              <p className="text-sm text-base-content/60">{t('empty')}</p>
-            ) : (
+            {!data || data.total === 0 ? (
+              <p className="text-sm text-base-content/60">{t('emptyCohort')}</p>
+            ) : data.average == null ? (
+              // A selection you have nothing in is still worth an answer: the
+              // people who do have something in it are the reason to look.
               <>
                 <p className="font-mono text-[11px] tracking-[0.18em] text-base-content/45 uppercase">
-                  {t('yourAverage')}
+                  {t('cohortAverage')}
                 </p>
-                <p className="font-display text-4xl font-bold tracking-tight sm:text-5xl">
-                  {grade(data.average)}
+                <h2 className="tnum font-display text-4xl font-bold tracking-tight sm:text-5xl">
+                  {data.cohortAverage ? grade(data.cohortAverage) : '—'}
+                </h2>
+                <p className="mt-1 max-w-md text-sm leading-relaxed text-base-content/60">
+                  {t('notMine')}
                 </p>
-                <p className="mt-1 text-xs text-base-content/50">
-                  {data.official ? t('official') : t('computed')}
+
+                <StatGrid columns="three" className="mt-6">
+                  <Stat
+                    label={t('cohortMedian')}
+                    value={data.cohortMedian ? grade(data.cohortMedian) : '—'}
+                    hint={t('medianDesc')}
+                  />
+                  <Stat
+                    label={t('people')}
+                    value={format.number(data.total)}
+                    hint={t('peopleDesc')}
+                  />
+                  <Stat label={t('yourAverage')} value="—" hint={t('emptyShort')} />
+                </StatGrid>
+              </>
+            ) : (
+              <>
+                {/* The question is where you stand, so that is the headline. The
+                    average is what produced it and sits with the other figures. */}
+                <p className="font-mono text-[11px] tracking-[0.18em] text-base-content/45 uppercase">
+                  {t('placeLabel')}
                 </p>
-                <div className="stats stats-vertical sm:stats-horizontal mt-4 w-full border border-base-300">
-                  <div className="stat">
-                    <div className="stat-title">{t('rank')}</div>
-                    <div className="stat-value tnum text-2xl">
-                      {t('rankValue', {
-                        rank: format.number(data.rank ?? 0),
-                        total: format.number(data.total),
-                      })}
-                    </div>
-                    <div className="stat-desc">
-                      {t('top', { percentile: format.number(data.percentile ?? 0) })}
-                    </div>
-                  </div>
-                  <div className="stat">
-                    <div className="stat-title">{t('cohortAverage')}</div>
-                    <div className="stat-value tnum text-2xl">
-                      {data.cohortAverage ? grade(data.cohortAverage) : '—'}
-                    </div>
-                    <div className="stat-desc">{t('cohortDesc')}</div>
-                  </div>
-                  <div className="stat">
-                    <div className="stat-title">{t('cohortMedian')}</div>
-                    <div className="stat-value tnum text-2xl">
-                      {data.cohortMedian ? grade(data.cohortMedian) : '—'}
-                    </div>
-                    <div className="stat-desc">{t('medianDesc')}</div>
-                  </div>
-                  <div className="stat">
-                    <div className="stat-title">{t('counted')}</div>
-                    <div className="stat-value tnum text-2xl">{format.number(data.courses)}</div>
-                    <div className="stat-desc">
-                      {t('countedDesc', { credits: format.number(data.credits) })}
-                    </div>
-                  </div>
-                </div>
+                <h2 className="tnum font-display text-4xl font-bold tracking-tight text-balance sm:text-5xl">
+                  {t('place', {
+                    rank: format.number(data.rank ?? 0),
+                    total: format.number(data.total),
+                  })}
+                </h2>
+                <p className="mt-1 text-sm text-base-content/60">
+                  {t('top', { percentile: format.number(data.percentile ?? 0) })} ·{' '}
+                  {t('placeDesc')}
+                </p>
+
+                <StatGrid columns="four" className="mt-6">
+                  <Stat
+                    label={t('yourAverage')}
+                    value={grade(data.average)}
+                    hint={data.official ? t('officialShort') : t('computedShort')}
+                    tone="accent"
+                  />
+                  <Stat
+                    label={t('cohortAverage')}
+                    value={data.cohortAverage ? grade(data.cohortAverage) : '—'}
+                    hint={t('cohortDesc')}
+                  />
+                  <Stat
+                    label={t('cohortMedian')}
+                    value={data.cohortMedian ? grade(data.cohortMedian) : '—'}
+                    hint={t('medianDesc')}
+                  />
+                  <Stat
+                    label={t('counted')}
+                    value={format.number(data.courses)}
+                    hint={t('countedDesc', { credits: format.number(data.credits) })}
+                  />
+                </StatGrid>
               </>
             )}
           </section>
 
           <section className="space-y-5 border-t border-base-300 pt-6">
 
-            <Field label={t('calendarSemester')} hint={t('calendarSemesterHint')}>
+            <Field label={t('calendarSemester')} hint={t('anySemesterHint')}>
               <select
                 value={semester}
                 onChange={(event) => setSemester(event.target.value)}
