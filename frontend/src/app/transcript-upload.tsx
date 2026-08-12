@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { useFormatter, useTranslations } from 'next-intl'
+import { useTranslations } from 'next-intl'
 
 import { useUploadTranscript, WouldReplaceError } from '@/lib/rank'
 
@@ -15,14 +15,12 @@ import { useUploadTranscript, WouldReplaceError } from '@/lib/rank'
  */
 export function TranscriptUpload() {
   const t = useTranslations('upload')
-  const format = useFormatter()
 
   const [file, setFile] = useState<File | null>(null)
   const input = useRef<HTMLInputElement>(null)
   const dialog = useRef<HTMLDialogElement>(null)
   const upload = useUploadTranscript()
 
-  const parsed = upload.data
   const collision = upload.error instanceof WouldReplaceError ? upload.error : null
 
   // The picked file is spent once it has been read, so the control goes back to
@@ -87,44 +85,15 @@ export function TranscriptUpload() {
           </button>
         </form>
 
-        {upload.error && (
+        {upload.error && !collision && (
           <div role="alert" className="alert alert-error alert-soft">
-            <div>
-              <p>{t('error')}</p>
-              <p className="mt-1 font-mono text-xs opacity-70">{upload.error.message}</p>
-            </div>
+            {upload.error.message}
           </div>
         )}
 
-        {parsed && (
-          <div className="rounded-box border border-base-300 bg-base-100 p-4">
-            <p className="font-mono text-[11px] tracking-[0.18em] text-base-content/45 uppercase">
-              {t('resultTitle')}
-            </p>
-
-            <dl className="mt-3 space-y-1.5 text-sm">
-              <Row label={t('program')} value={parsed.program} />
-              <Row label={t('degree')} value={parsed.degree} />
-              <Row
-                label={t('grade')}
-                value={format.number(parsed.grade, {
-                  minimumFractionDigits: 1,
-                  maximumFractionDigits: 2,
-                })}
-              />
-              <Row
-                label={t('credits')}
-                value={t('creditsValue', {
-                  credits: format.number(parsed.credits),
-                  maxCredits: format.number(parsed.maxCredits),
-                })}
-              />
-              <Row label={t('modules')} value={format.number(parsed.moduleCount)} />
-            </dl>
-
-            <div role="status" className="alert alert-success alert-soft mt-4">
-              {t('applied')}
-            </div>
+        {upload.isSuccess && (
+          <div role="status" className="alert alert-success alert-soft">
+            {t('applied')}
           </div>
         )}
       </div>
@@ -164,11 +133,3 @@ export function TranscriptUpload() {
   )
 }
 
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-baseline justify-between gap-4">
-      <dt className="text-base-content/55">{label}</dt>
-      <dd className="tnum font-medium">{value}</dd>
-    </div>
-  )
-}
