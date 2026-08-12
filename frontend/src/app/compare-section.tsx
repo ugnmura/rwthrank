@@ -24,21 +24,17 @@ export function CompareSection() {
   // Opened from a class on the dashboard, the page starts on that class rather
   // than making the reader find it again in the list below.
   const params = useSearchParams()
-  const [studySemester, setStudySemester] = useState(Number(params.get('studySemester') ?? 0))
   const [semester, setSemester] = useState(params.get('semester') ?? '')
   const [picked, setPicked] = useState<string[]>(params.getAll('course'))
-  const [credits, setCredits] = useState(params.get('credits') ?? '')
   const [ownProgram, setOwnProgram] = useState(params.get('cohort') !== 'all')
 
   // Built from what the person actually has, so no filter can select nothing.
-  const { semesters, courses, creditSizes } = useMemo(() => {
+  const { semesters, courses } = useMemo(() => {
     const sem = new Set<string>()
-    const cp = new Set<number>()
     const byCourse = new Map<string, string>()
 
     for (const row of results ?? []) {
       if (row.semester) sem.add(row.semester)
-      if (row.credits) cp.add(row.credits)
       const name =
         (locale === 'en' && row.expand?.course?.nameEn) || row.expand?.course?.name || ''
       if (name) byCourse.set(row.course, name)
@@ -46,17 +42,15 @@ export function CompareSection() {
 
     return {
       semesters: [...sem].sort(),
-      creditSizes: [...cp].sort((a, b) => a - b),
       courses: [...byCourse].map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name)),
     }
   }, [results, locale])
 
   const filters: CompareFilters = {
-    studySemester,
+    // Always every semester: the page does not offer to narrow by one.
+    studySemester: -1,
     semesters: semester ? [semester] : undefined,
     courses: picked.length ? picked : undefined,
-    minCredits: credits ? Number(credits) : undefined,
-    maxCredits: credits ? Number(credits) : undefined,
     ...(ownProgram ? {} : { program: '', degree: '' }),
   }
 
@@ -125,21 +119,6 @@ export function CompareSection() {
           </section>
 
           <section className="space-y-5 border-t border-base-300 pt-6">
-            <Field label={t('studySemester')} hint={t('studySemesterHint')}>
-              <select
-                value={studySemester}
-                onChange={(event) => setStudySemester(Number(event.target.value))}
-                className="select select-sm bg-base-200"
-              >
-                <option value={0}>{t('mySemester')}</option>
-                <option value={-1}>{t('allSemesters')}</option>
-                {semesters.map((_, index) => (
-                  <option key={index} value={index + 1}>
-                    {t('nthSemester', { n: index + 1 })}
-                  </option>
-                ))}
-              </select>
-            </Field>
 
             <Field label={t('calendarSemester')} hint={t('calendarSemesterHint')}>
               <select
@@ -156,20 +135,6 @@ export function CompareSection() {
               </select>
             </Field>
 
-            <Field label={t('creditSize')} hint={t('creditSizeHint')}>
-              <select
-                value={credits}
-                onChange={(event) => setCredits(event.target.value)}
-                className="select select-sm bg-base-200"
-              >
-                <option value="">{t('anyCredits')}</option>
-                {creditSizes.map((value) => (
-                  <option key={value} value={value}>
-                    {t('cpValue', { credits: format.number(value) })}
-                  </option>
-                ))}
-              </select>
-            </Field>
 
             <Field label={t('cohort')} hint={t('cohortHint')}>
               <label className="label cursor-pointer justify-start gap-3">
