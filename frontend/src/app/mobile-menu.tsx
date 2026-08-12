@@ -3,10 +3,17 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { Bars3Icon } from '@heroicons/react/24/outline'
+import {
+  ArrowRightStartOnRectangleIcon,
+  Bars3Icon,
+  ChartBarIcon,
+  Cog6ToothIcon,
+  ScaleIcon,
+} from '@heroicons/react/24/outline'
 
+import { locales, localeNames } from '@/i18n/config'
+import { setStoredLocale, useStoredLocale } from '@/i18n/locale-store'
 import { useAuthRecord, useLogout } from '@/lib/auth'
-import { LocaleSwitcher } from './locale-switcher'
 import { ThemeSwitcher } from './theme-switcher'
 
 /**
@@ -16,8 +23,11 @@ import { ThemeSwitcher } from './theme-switcher'
  * second line, which pushes the page down and reads like a mistake. Collapsed,
  * the header stays one line at every width.
  *
- * Nothing in the panel is labelled: two language names and a moon are their own
- * explanation, and a row saying "Language" above them is furniture.
+ * Everything in the panel is something to press. Nothing is labelled and
+ * nothing merely informs: two language names and a moon explain themselves, and
+ * a heading above them would be furniture. Every row answers a touch — the
+ * ground darkens under a finger and the press is visible on the way down, which
+ * is the only feedback a phone can give without a cursor.
  */
 export function MobileMenu() {
   const t = useTranslations('nav')
@@ -25,7 +35,11 @@ export function MobileMenu() {
   const logout = useLogout()
   const path = usePathname().replace(/\/$/, '')
 
-  const row = 'px-4 py-2.5 text-sm normal-case tracking-normal transition-colors'
+  const pages = [
+    { href: '/dashboard', label: t('dashboard'), Icon: ChartBarIcon },
+    { href: '/dashboard/compare', label: t('compare'), Icon: ScaleIcon },
+    { href: '/settings', label: t('settings'), Icon: Cog6ToothIcon },
+  ]
 
   return (
     <div className="dropdown dropdown-end sm:hidden">
@@ -33,64 +47,83 @@ export function MobileMenu() {
         tabIndex={0}
         role="button"
         aria-label={t('menu')}
-        className="flex items-center p-1 text-base-content/50 transition-colors hover:text-base-content/80"
+        className="flex items-center p-1 text-base-content/50 transition-colors hover:text-base-content/80 active:scale-90 active:text-base-content"
       >
         <Bars3Icon className="size-5" />
       </div>
 
       <div
         tabIndex={0}
-        className="dropdown-content z-20 mt-2 w-56 border border-base-300 bg-base-100 shadow-lg"
+        className="dropdown-content z-20 mt-2 w-56 border border-base-300 bg-base-100 p-1 shadow-lg"
       >
         {user ? (
           <>
-            <p className="border-b border-base-300 px-4 py-2.5 text-xs break-all text-base-content/40 normal-case tracking-normal">
-              {user.email}
-            </p>
-            <nav className="flex flex-col py-1">
-              {[
-                { href: '/dashboard', label: t('dashboard') },
-                { href: '/dashboard/compare', label: t('compare') },
-                { href: '/settings', label: t('settings') },
-              ].map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  aria-current={path === link.href ? 'page' : undefined}
-                  className={`${row} ${
-                    path === link.href
-                      ? 'bg-base-200 font-medium text-base-content'
-                      : 'text-base-content/70 hover:bg-base-200 hover:text-base-content'
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
-              <button
-                type="button"
-                onClick={logout}
-                className={`${row} text-left text-base-content/70 hover:bg-base-200 hover:text-base-content`}
-              >
-                {t('signOut')}
-              </button>
-            </nav>
+            {pages.map(({ href, label, Icon }) => (
+              <Link key={href} href={href} aria-current={path === href ? 'page' : undefined} className={row(path === href)}>
+                <Icon className="size-4 shrink-0" />
+                {label}
+              </Link>
+            ))}
+            <button type="button" onClick={logout} className={`${row(false)} w-full text-left`}>
+              <ArrowRightStartOnRectangleIcon className="size-4 shrink-0" />
+              {t('signOut')}
+            </button>
           </>
         ) : (
-          <nav className="flex flex-col py-1">
-            <Link
-              href="/login"
-              className={`${row} text-base-content/70 hover:bg-base-200 hover:text-base-content`}
-            >
-              {t('signIn')}
-            </Link>
-          </nav>
+          <Link href="/login" className={row(false)}>
+            <ArrowRightStartOnRectangleIcon className="size-4 shrink-0" />
+            {t('signIn')}
+          </Link>
         )}
 
-        <div className="flex items-center justify-between border-t border-base-300 px-4 py-2.5">
-          <LocaleSwitcher />
-          <ThemeSwitcher />
+        <div className="mt-1 flex items-center justify-between gap-2 border-t border-base-300 p-1 pt-2">
+          <LocaleToggle />
+          <span className="flex size-8 items-center justify-center transition-transform active:scale-90">
+            <ThemeSwitcher />
+          </span>
         </div>
       </div>
+    </div>
+  )
+}
+
+/** One pressable row: darkens on touch, dips on the press, marked when active. */
+function row(current: boolean) {
+  return [
+    'flex items-center gap-3 px-3 py-2.5 text-sm normal-case tracking-normal',
+    'transition-colors duration-75 active:bg-base-300',
+    current
+      ? 'bg-base-200 font-medium text-base-content'
+      : 'text-base-content/70 hover:bg-base-200 hover:text-base-content',
+  ].join(' ')
+}
+
+/**
+ * The two languages as one control rather than a pair of links, so the one you
+ * are reading is visibly held down and the other is obviously pressable.
+ */
+function LocaleToggle() {
+  const active = useStoredLocale()
+  const t = useTranslations('language')
+
+  return (
+    <div className="flex border border-base-300" role="group" aria-label={t('label')}>
+      {locales.map((locale) => (
+        <button
+          key={locale}
+          type="button"
+          lang={locale}
+          aria-pressed={locale === active}
+          onClick={() => setStoredLocale(locale)}
+          className={`px-2.5 py-1 font-mono text-[11px] tracking-[0.14em] uppercase transition-colors duration-75 ${
+            locale === active
+              ? 'bg-base-content/85 text-base-100'
+              : 'text-base-content/45 hover:bg-base-200 hover:text-base-content active:bg-base-300'
+          }`}
+        >
+          {localeNames[locale]}
+        </button>
+      ))}
     </div>
   )
 }
