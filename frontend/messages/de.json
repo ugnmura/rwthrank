@@ -142,6 +142,9 @@
     "degreePlaceholder": "Abschluss",
     "programPlaceholder": "Fach",
     "apply": "Übernehmen",
-    "saving": "Wird gespeichert"
+    "saving": "Wird gespeichert",
+    "viewLabel": "Ansicht",
+    "viewSubject": "Nur {program}",
+    "viewAll": "Alle Fächer"
   }
 }

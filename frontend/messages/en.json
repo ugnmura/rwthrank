@@ -142,6 +142,9 @@
     "degreePlaceholder": "Degree",
     "programPlaceholder": "Subject",
     "apply": "Apply",
-    "saving": "Saving"
+    "saving": "Saving",
+    "viewLabel": "View",
+    "viewSubject": "{program} only",
+    "viewAll": "All subjects"
   }
 }

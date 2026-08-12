@@ -59,7 +59,9 @@ func handleRank(e *core.RequestEvent) error {
 	// everyone and narrows to the programme once a transcript names it. Ranking
 	// against a mixed population is worse than ranking against a matched one,
 	// but it is far better than refusing to answer at all.
-	scoped := program != "" && degree != ""
+	// ?scope=overall looks at everyone without discarding the programme, so
+	// switching the view back and forth never costs the user their setting.
+	scoped := program != "" && degree != "" && e.Request.URL.Query().Get("scope") != "overall"
 
 	total, err := e.App.CountRecords(usersCollection, cohort(program, degree, scoped))
 	if err != nil {

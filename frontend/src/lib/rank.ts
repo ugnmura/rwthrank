@@ -73,12 +73,13 @@ async function failure(response: Response) {
  * Keyed by user id so a second account on the same browser never reads the
  * first one's cached rank.
  */
-export function useRank() {
+export function useRank(view: 'auto' | 'overall' = 'auto') {
   const { data: user } = useAuthRecord()
 
   return useQuery({
-    queryKey: [...rankKey, user?.id],
-    queryFn: () => call('/api/rank') as Promise<RankSummary>,
+    queryKey: [...rankKey, user?.id, view],
+    queryFn: () =>
+      call(view === 'overall' ? '/api/rank?scope=overall' : '/api/rank') as Promise<RankSummary>,
     enabled: !!user,
   })
 }
@@ -99,7 +100,12 @@ export function useSaveProfile() {
 
       return pb.collection('users').update(record.id, patch)
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: rankKey }),
+    onSuccess: () => {
+      // Both: the rank re-scopes, and the record behind the filter's current
+      // values is refetched so the controls agree with what was saved.
+      queryClient.invalidateQueries({ queryKey: rankKey })
+      queryClient.invalidateQueries({ queryKey: ['auth', 'record'] })
+    },
   })
 }
 

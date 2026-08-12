@@ -22,13 +22,18 @@ export function AuthButton() {
 
   if (user) {
     return (
-      <button
-        type="button"
-        onClick={logout}
-        className="text-base-content/40 underline-offset-4 hover:text-base-content/80 hover:underline"
-      >
-        {t('signOut')}
-      </button>
+      <div className="flex items-center gap-3">
+        <span className="max-w-[12rem] truncate text-base-content/45 normal-case" title={user.email}>
+          {user.email}
+        </span>
+        <button
+          type="button"
+          onClick={logout}
+          className="text-base-content/40 underline-offset-4 hover:text-base-content/80 hover:underline"
+        >
+          {t('signOut')}
+        </button>
+      </div>
     )
   }
 
