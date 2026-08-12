@@ -54,6 +54,20 @@ NEXT_PUBLIC_POCKETBASE_URL = https://rwthrank.sushiwaumai.com
 It is read by the browser and inlined at build time, so changing it later needs a
 redeploy, not just a restart.
 
+## Mail
+
+Receiving on mindevice.net is Cloudflare Email Routing, already enabled. A
+catch-all forwards every address at the domain to the owner's inbox, and the
+`contact@` rule matches ahead of it.
+
+Sending is Resend on **rwthrank.mindevice.net**. It is deliberately a subdomain:
+the root SPF (`v=spf1 include:_spf.mx.cloudflare.net ~all`) is what makes
+inbound mail work, so a sending provider must not edit it. The DKIM, SPF and
+feedback records Resend generates all live under the subdomain.
+
+Resend's SMTP wants the literal username `resend` and the API key as the
+password. Put the key in `backend.env` as `SMTP_PASSWORD`, never in git.
+
 ## Things that will bite
 
 - **SMTP is not optional.** PocketBase deletes an OTP whose email fails to send,

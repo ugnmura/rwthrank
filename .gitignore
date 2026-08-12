@@ -15,3 +15,8 @@
 # agent worktrees and stray verification screenshots
 .claude/worktrees/
 *.png
+
+# secrets
+.env
+.env.local
+!.env.example
