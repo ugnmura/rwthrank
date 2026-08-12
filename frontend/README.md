@@ -30,9 +30,10 @@ least once. `pb` is cast to the generated `TypedPocketBase`, which is what makes
 
 `messages/de.json` and `messages/en.json`. German is the default and the fallback.
 
-Locale is stored in a cookie rather than the URL, so there is no routing layer and
-no proxy hop — `src/i18n/locale.ts` reads and writes it, and the switcher calls
-`router.refresh()` because messages resolve on the server.
+Locale is stored in localStorage rather than the URL, so there is no routing
+layer and no proxy hop. The site is a static export, so there is no server to
+read a cookie on either: `src/i18n/locale-store.ts` holds it and components
+subscribe through `useSyncExternalStore`.
 
 Numbers go through `useFormatter` rather than string templates, which is what
 renders a grade as `1,0` for a German reader and `1.0` for an English one. Keep

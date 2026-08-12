@@ -1,12 +1,13 @@
 # Deploying
 
-Backend runs on the Hetzner box as a `/srv` stack. Frontend runs on Vercel.
-Nothing in CI SSHes anywhere: the workflow pushes an image and Watchtower on the
-box pulls it, which is how the other stacks there work.
+Backend runs on the Hetzner box as a `/srv` stack. Frontend is a static export
+served from GitHub Pages. Nothing in CI SSHes anywhere: the workflow pushes an
+image and Watchtower on the box pulls it, which is how the other stacks there
+work.
 
 ```
-push to main (backend/**)  ->  build  ->  registry.sushiwaumai.com  ->  Watchtower  ->  live
-push to main (frontend/**) ->  Vercel git integration               ->  live
+push to main (backend/**)  ->  build  ->  ghcr.io  ->  Watchtower  ->  api.rwthrank.mindevice.net
+push to main (frontend/**) ->  build  ->  Pages artifact           ->  rwthrank.mindevice.net
 ```
 
 ## One-time: the backend stack
@@ -40,8 +41,8 @@ docker compose up -d
 Add `rwthrank` to `APPS` in `/srv/Makefile` so `make up` / `make pull APP=rwthrank`
 cover it like every other stack.
 
-DNS: `rwthrank.sushiwaumai.com` needs an A record on the box before Traefik can
-get a certificate. Traefik picks the container up from its labels, so there is no
+DNS: `api.rwthrank.mindevice.net` needs an A record on the box before Traefik
+can get a certificate. Traefik picks the container up from its labels, so there is no
 proxy config to edit.
 
 Create the dashboard superuser once the container is running:
@@ -52,15 +53,17 @@ docker compose exec rwthrank-backend /pb/rwthrank superuser upsert you@example.c
 
 ## One-time: the frontend
 
-Import the repo in Vercel and set **Root Directory** to `frontend`. Then one
-environment variable, for all environments:
+GitHub Pages, from the `pages.yml` workflow — Settings → Pages → Source: GitHub
+Actions. `frontend/public/CNAME` carries the custom domain, and
+`rwthrank.mindevice.net` needs a CNAME record pointing at the Pages host.
+
+The backend URL is inlined into the client bundle at build time:
 
 ```
-NEXT_PUBLIC_POCKETBASE_URL = https://rwthrank.sushiwaumai.com
+NEXT_PUBLIC_POCKETBASE_URL = https://api.rwthrank.mindevice.net
 ```
 
-It is read by the browser and inlined at build time, so changing it later needs a
-redeploy, not just a restart.
+Because it is baked in, changing it needs a rebuild rather than a restart.
 
 ## Mail
 
@@ -86,8 +89,8 @@ password. Put the key in `backend.env` as `SMTP_PASSWORD`, never in git.
   It is not in any image and not in git. Back it up.
 - **Disk.** The box was at roughly 72% of 38 GB at last check, before this stack.
   Images accumulate; `/srv/cleanup.sh` exists for that.
-- **CORS.** The Vercel frontend calls the backend cross-origin. PocketBase allows
+- **CORS.** The Pages frontend calls the backend cross-origin. PocketBase allows
   all origins by default, which is fine here but worth narrowing if that changes.
-- **The frontend Docker image is now unused in production.** `frontend/Dockerfile`
-  still builds, and the local compose stack still uses its `dev` target, but
-  Vercel builds from source and ignores it.
+- **The frontend Docker image is unused in production.** `frontend/Dockerfile`
+  still builds and the local compose stack uses its `dev` target, but Pages
+  serves a static export and ignores it.
