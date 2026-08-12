@@ -35,7 +35,6 @@ export default function Home() {
           <ThemeSwitcher />
           <LocaleSwitcher />
           <AuthButton />
-          <AuthButton />
         </div>
       </header>
 
