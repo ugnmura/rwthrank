@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl'
 import { SiteHeader } from '../site-header'
 import { useQueryClient } from '@tanstack/react-query'
 
+import { readMagicLink } from '@/lib/magic-link'
 import { pb } from '@/lib/pocketbase'
 
 type State = 'checking' | 'done' | 'failed'
@@ -30,17 +31,17 @@ export default function VerifyPage() {
     if (redeemed.current) return
     redeemed.current = true
 
-    const [id, code] = window.location.hash.replace(/^#/, '').split('.')
+    const link = readMagicLink(window.location.hash)
 
     const run = async () => {
-      if (!id || !code) {
+      if (!link) {
         setState('failed')
         setMessage(t('linkIncomplete'))
         return
       }
 
       try {
-        await pb.collection('users').authWithOTP(id, code)
+        await pb.collection('users').authWithOTP(link.otpId, link.code)
 
         // Nothing to apply here: the grade was stored with the account when the
         // link was requested, so verifying is only about the session.

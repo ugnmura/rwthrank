@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useFormatter, useLocale, useTranslations } from 'next-intl'
 
+import { compareOptions } from '@/lib/compare-options'
 import {
   useComparison,
   useCompareOptions,
@@ -34,25 +35,10 @@ export function CompareSection() {
   const [semester, setSemester] = useState(params.get('semester') ?? '')
   const [picked, setPicked] = useState<string[]>(params.getAll('course'))
 
-  // Classes are the caller's own — comparing over a class you never sat has no
-  // answer — but the semesters are everyone's, so a semester you have not
-  // reached yet can still be looked at.
-  const { semesters, courses } = useMemo(() => {
-    const sem = new Set<string>(options?.semesters ?? [])
-    const byCourse = new Map<string, string>()
-
-    for (const row of results ?? []) {
-      if (row.semester) sem.add(row.semester)
-      const name =
-        (locale === 'en' && row.expand?.course?.nameEn) || row.expand?.course?.name || ''
-      if (name) byCourse.set(row.course, name)
-    }
-
-    return {
-      semesters: [...sem].sort(),
-      courses: [...byCourse].map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name)),
-    }
-  }, [results, options, locale])
+  const { semesters, courses } = useMemo(
+    () => compareOptions(results, options?.semesters, locale),
+    [results, options, locale]
+  )
 
   const filters: CompareFilters = {
     // Always every semester: the page does not offer to narrow by one.

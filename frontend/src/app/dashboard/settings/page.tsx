@@ -7,8 +7,8 @@ import { useMutation } from '@tanstack/react-query'
 
 import { useAuthRecord } from '@/lib/auth'
 import { pb } from '@/lib/pocketbase'
-import { SignedInOnly } from '../signed-in-only'
-import { SiteHeader } from '../site-header'
+import { SignedInOnly } from '../../signed-in-only'
+import { SiteHeader } from '../../site-header'
 
 /**
  * Account settings, which for now is one thing: getting rid of it.

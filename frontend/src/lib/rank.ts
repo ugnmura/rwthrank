@@ -3,6 +3,7 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { useAuthRecord } from './auth'
+import { call, WouldReplaceError } from './api'
 import { pb } from './pocketbase'
 import type { UsersResponse } from '@/types/pocketbase'
 
@@ -38,53 +39,10 @@ export type Transcript = {
   moduleCount: number
 }
 
+export { WouldReplaceError }
+
 const rankKey = ['rank'] as const
 const transcriptsKey = ['transcripts'] as const
-
-// Both endpoints sit on PocketBase next to the collections and take the same
-// bearer token, but the SDK only routes to /api/collections — so they are fetched
-// by hand.
-async function call(path: string, init?: RequestInit) {
-  const response = await fetch(`${pb.baseURL}${path}`, {
-    ...init,
-    headers: { Authorization: pb.authStore.token, ...init?.headers },
-  })
-
-  if (!response.ok) throw await failure(response)
-
-  return response.json()
-}
-
-/**
- * PocketBase reports failures as `{ message }`, and that message is the one
- * worth showing. A missing route or a proxy in between answers with something
- * else entirely, and then the status line is the only honest thing left.
- */
-export class WouldReplaceError extends Error {
-  constructor(readonly program: string, readonly degree: string) {
-    super('would replace')
-  }
-}
-
-async function failure(response: Response) {
-  const body = (await response.json().catch(() => null)) as {
-    message?: unknown
-    replaces?: { program?: string; degree?: string }
-  } | null
-
-  // Not an error the user should read: it is the server asking whether to go
-  // ahead, and it names what is at stake.
-  if (response.status === 409 && body?.replaces) {
-    return new WouldReplaceError(body.replaces.program ?? '', body.replaces.degree ?? '')
-  }
-  const message = body?.message
-
-  return new Error(
-    typeof message === 'string' && message
-      ? message
-      : `${response.status} ${response.statusText}`.trim()
-  )
-}
 
 /**
  * The user's position in their own program.

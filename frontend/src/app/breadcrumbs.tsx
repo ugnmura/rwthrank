@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 
+import { crumbsFor } from '@/lib/trail'
+
 /**
  * Where you are, and the way back up.
  *
@@ -14,16 +16,15 @@ export function Breadcrumbs() {
   const t = useTranslations('nav')
   const path = usePathname()
 
-  const segments = path.replace(/^\/|\/$/g, '').split('/').filter(Boolean)
-  if (segments.length === 0) return null
-
-  const labels: Record<string, string> = {
+  const crumbs = crumbsFor(path, {
     dashboard: t('dashboard'),
     compare: t('compare'),
     settings: t('settings'),
     legal: t('legal'),
     verify: t('verify'),
-  }
+  })
+
+  if (crumbs.length === 0) return null
 
   return (
     <nav className="breadcrumbs mx-auto w-full max-w-2xl px-6 pt-1.5 pb-0 text-xs text-base-content/60 sm:px-10">
@@ -31,23 +32,17 @@ export function Breadcrumbs() {
         <li>
           <Link href="/" className="hover:text-base-content">rwthrank</Link>
         </li>
-        {segments.map((segment, index) => {
-          const href = '/' + segments.slice(0, index + 1).join('/')
-          const label = labels[segment] ?? segment
-          const last = index === segments.length - 1
-
-          return (
-            <li key={href}>
-              {last ? (
-                label
-              ) : (
-                <Link href={href} className="hover:text-base-content">
-                  {label}
-                </Link>
-              )}
-            </li>
-          )
-        })}
+        {crumbs.map(({ href, label, current }) => (
+          <li key={href}>
+            {current ? (
+              label
+            ) : (
+              <Link href={href} className="hover:text-base-content">
+                {label}
+              </Link>
+            )}
+          </li>
+        ))}
       </ul>
     </nav>
   )

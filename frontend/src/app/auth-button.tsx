@@ -43,7 +43,7 @@ export function AuthButton() {
             <Link href="/dashboard/compare">{t('compare')}</Link>
           </li>
           <li>
-            <Link href="/settings">{t('settings')}</Link>
+            <Link href="/dashboard/settings">{t('settings')}</Link>
           </li>
           <li>
             <button type="button" onClick={logout}>

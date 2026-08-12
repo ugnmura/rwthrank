@@ -38,7 +38,7 @@ export function MobileMenu() {
   const pages = [
     { href: '/dashboard', label: t('dashboard'), Icon: ChartBarIcon },
     { href: '/dashboard/compare', label: t('compare'), Icon: ScaleIcon },
-    { href: '/settings', label: t('settings'), Icon: Cog6ToothIcon },
+    { href: '/dashboard/settings', label: t('settings'), Icon: Cog6ToothIcon },
   ]
 
   return (
