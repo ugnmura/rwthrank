@@ -101,7 +101,9 @@
     "signOut": "Abmelden",
     "dashboard": "Platzierung",
     "transcripts": "Notenspiegel",
-    "upload": "Hochladen"
+    "upload": "Hochladen",
+    "account": "Konto",
+    "settings": "Einstellungen"
   },
   "legal": {
     "title": "Impressum und Datenschutz",
@@ -159,5 +161,32 @@
     "confirmBody": "Der Notenspiegel für {program} und alle daraus gelesenen Noten werden gelöscht. Rückgängig machen lässt sich das nur, indem du die Datei erneut hochlädst.",
     "useThis": "Diese Platzierung anzeigen",
     "inUse": "Wird gerade angezeigt"
+  },
+  "modules": {
+    "loading": "Wird geladen",
+    "none": "Zu diesem Eintrag gibt es keine einzelnen Noten.",
+    "course": "Fach",
+    "grade": "Note",
+    "credits": "CP",
+    "semester": "Semester",
+    "passed": "bestanden",
+    "ungradedPass": "Bestanden ohne Note",
+    "standing": "Platz {rank} von {total} · Top {percentile} %",
+    "noStanding": "Für diese Veranstaltung gibt es noch keinen Vergleich."
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "accountLabel": "Angemeldet als",
+    "dangerTitle": "Konto löschen",
+    "dangerBody": "Löscht dein Konto, alle hochgeladenen Notenspiegel und alle daraus gelesenen Noten. Das lässt sich nicht rückgängig machen.",
+    "delete": "Konto löschen",
+    "cancel": "Abbrechen",
+    "continue": "Weiter",
+    "confirm1Title": "Konto wirklich löschen?",
+    "confirm1Body": "Dein Konto, alle Notenspiegel, die hochgeladenen Dateien und alle daraus gelesenen Noten werden gelöscht. Es gibt keinen Weg zurück.",
+    "confirm2Title": "Letzte Sicherheitsfrage",
+    "confirm2Body": "Tipp zur Bestätigung {email} ein.",
+    "deleteForever": "Endgültig löschen",
+    "deleting": "Wird gelöscht"
   }
 }

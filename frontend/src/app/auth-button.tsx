@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 
 import { useAuthRecord, useLogout } from '@/lib/auth'
@@ -9,7 +10,8 @@ import { useAuthRecord, useLogout } from '@/lib/auth'
  *
  * Signed out it says "sign in" and drops focus into the email field, because
  * signing in and registering are the same form: there is no separate login page
- * to send anyone to.
+ * to send anyone to. Signed in it is a menu, which keeps signing out and
+ * deleting an account one step further away than anything else in the header.
  */
 export function AuthButton() {
   const t = useTranslations('nav')
@@ -22,17 +24,28 @@ export function AuthButton() {
 
   if (user) {
     return (
-      <div className="flex items-center gap-3">
-        <span className="max-w-[12rem] truncate text-base-content/45 normal-case" title={user.email}>
-          {user.email}
-        </span>
-        <button
-          type="button"
-          onClick={logout}
-          className="text-base-content/40 underline-offset-4 hover:text-base-content/80 hover:underline"
+      <div className="dropdown dropdown-end">
+        <div
+          tabIndex={0}
+          role="button"
+          className="text-base-content/70 underline-offset-4 hover:underline"
         >
-          {t('signOut')}
-        </button>
+          {t('account')}
+        </div>
+        <ul
+          tabIndex={0}
+          className="dropdown-content menu z-10 w-56 border border-base-300 bg-base-100 p-2 normal-case shadow"
+        >
+          <li className="menu-title px-3 py-1 text-xs break-all normal-case">{user.email}</li>
+          <li>
+            <Link href="/settings">{t('settings')}</Link>
+          </li>
+          <li>
+            <button type="button" onClick={logout}>
+              {t('signOut')}
+            </button>
+          </li>
+        </ul>
       </div>
     )
   }

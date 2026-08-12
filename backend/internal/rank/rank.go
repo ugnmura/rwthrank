@@ -35,6 +35,7 @@ type response struct {
 func RegisterRoutes(app *pocketbase.PocketBase) {
 	app.OnServe().BindFunc(func(se *core.ServeEvent) error {
 		se.Router.GET("/api/rank", handleRank).Bind(apis.RequireAuth())
+		registerCourseRoute(se)
 
 		return se.Next()
 	})

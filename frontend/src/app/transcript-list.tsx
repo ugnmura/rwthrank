@@ -6,6 +6,7 @@ import { TrashIcon } from '@heroicons/react/24/outline'
 
 import { useDeleteTranscript, useTranscripts, type StoredTranscript } from '@/lib/rank'
 import { SubjectPicker } from './subject-picker'
+import { TranscriptModules } from './transcript-modules'
 
 /**
  * The transcripts a user has uploaded, with a way to remove them.
@@ -28,6 +29,8 @@ export function TranscriptList({
   const remove = useDeleteTranscript()
 
   const [pending, setPending] = useState<StoredTranscript | null>(null)
+  // One transcript open at a time; its modules load only when opened.
+  const [open, setOpen] = useState<string>()
   const dialog = useRef<HTMLDialogElement>(null)
 
   if (!transcripts?.length) return null
@@ -60,7 +63,11 @@ export function TranscriptList({
             }`}
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="min-w-0">
+            <button
+              type="button"
+              onClick={() => setOpen(open === item.id ? undefined : item.id)}
+              className="min-w-0 text-left"
+            >
               <p className="font-medium">
                 {item.program || t('unknownProgram')}
                 {item.degree ? ` · ${item.degree}` : ''}
@@ -72,7 +79,7 @@ export function TranscriptList({
                   maxCredits: format.number(item.maxCredits),
                 })}
               </p>
-            </div>
+            </button>
 
             <button
               type="button"
@@ -85,7 +92,9 @@ export function TranscriptList({
             </button>
             </div>
 
-            {/* Only the placeholder a typed grade creates has no subject. */}
+            {open === item.id && <TranscriptModules transcript={item.id} />}
+
+            {/* Only the placeholder a typed grade creates has no field of study. */}
             {!item.program && <SubjectPicker id={item.id} />}
 
             {/* One subject at a time, so which document is being ranked is a

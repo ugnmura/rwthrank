@@ -101,7 +101,9 @@
     "signOut": "Sign out",
     "dashboard": "Rank",
     "transcripts": "Transcripts",
-    "upload": "Upload"
+    "upload": "Upload",
+    "account": "Account",
+    "settings": "Settings"
   },
   "legal": {
     "title": "Legal notice and privacy",
@@ -159,5 +161,32 @@
     "confirmBody": "The transcript for {program} and every grade read from it will be deleted. The only way back is uploading the file again.",
     "useThis": "Rank me on this one",
     "inUse": "Currently shown"
+  },
+  "modules": {
+    "loading": "Loading",
+    "none": "This entry has no individual grades.",
+    "course": "Class",
+    "grade": "Grade",
+    "credits": "CP",
+    "semester": "Semester",
+    "passed": "passed",
+    "ungradedPass": "Passed without a grade",
+    "standing": "Rank {rank} of {total} · top {percentile} %",
+    "noStanding": "No comparison for this class yet."
+  },
+  "settings": {
+    "title": "Settings",
+    "accountLabel": "Signed in as",
+    "dangerTitle": "Delete account",
+    "dangerBody": "Deletes your account, every uploaded transcript and every grade read from them. This cannot be undone.",
+    "delete": "Delete account",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "confirm1Title": "Delete your account?",
+    "confirm1Body": "Your account, every transcript, the uploaded files and every grade read from them will be deleted. There is no way back.",
+    "confirm2Title": "Last check",
+    "confirm2Body": "Type {email} to confirm.",
+    "deleteForever": "Delete permanently",
+    "deleting": "Deleting"
   }
 }

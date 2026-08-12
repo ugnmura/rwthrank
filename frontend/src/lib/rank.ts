@@ -225,3 +225,52 @@ export function useSetSubject() {
     },
   })
 }
+
+/** One module on a transcript, with the course it belongs to expanded. */
+export type Result = {
+  id: string
+  course: string
+  grade: number | null
+  passed: boolean
+  credits: number | null
+  semester: string
+  expand?: { course?: { name: string } }
+}
+
+/**
+ * The modules read off one transcript.
+ *
+ * Only fetched once a transcript is opened: a person can have several, and
+ * loading every module of every one to show a list of documents would be work
+ * nobody asked for.
+ */
+export function useResults(transcript?: string) {
+  return useQuery({
+    queryKey: ['results', transcript],
+    enabled: Boolean(transcript),
+    queryFn: () =>
+      pb.collection('results').getFullList({
+        filter: `transcript = "${transcript}"`,
+        expand: 'course',
+        sort: 'semester',
+      }) as unknown as Promise<Result[]>,
+  })
+}
+
+/** Where the caller stands in one class. */
+export type CourseRank = {
+  course: string
+  grade: number | null
+  rank: number | null
+  total: number
+  percentile: number | null
+}
+
+/** Fetched only once a class is opened, the same way modules are. */
+export function useCourseRank(course?: string) {
+  return useQuery({
+    queryKey: ['course-rank', course],
+    enabled: Boolean(course),
+    queryFn: () => call(`/api/rank/course/${course}`) as Promise<CourseRank>,
+  })
+}
