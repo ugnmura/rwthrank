@@ -10,6 +10,8 @@ package auth
 
 import (
 	"fmt"
+
+	"github.com/pocketbase/dbx"
 	"net/url"
 	"os"
 	"strings"
@@ -92,8 +94,13 @@ func sendMagicLink(app *pocketbase.PocketBase) {
 // endpoint still answers identically for known and unknown emails.
 func createAccountOnFirstOTP(app *pocketbase.PocketBase) {
 	app.OnRecordRequestOTPRequest(usersCollection).BindFunc(func(e *core.RecordCreateOTPRequestEvent) error {
+		// A returning address already has its account; the grade below still has
+		// to be stored, because someone who signed up before and never finished
+		// is filling the same form again.
 		if e.Record != nil {
-			return e.Next() // returning user
+			storeSignupGrade(e, e.Record.Id)
+
+			return e.Next()
 		}
 
 		email, err := requestedEmail(e)
@@ -119,20 +126,9 @@ func createAccountOnFirstOTP(app *pocketbase.PocketBase) {
 			record = existing
 		} else {
 			e.App.Logger().Info("Registered account from OTP request", "email", email, "recordId", record.Id)
-
-			// Registration asks for an address and a grade in one form, so the
-			// grade is stored with the account it belongs to. Doing it here
-			// rather than after the link is clicked means it cannot be lost
-			// between the two, and nobody is asked for the same number twice.
-			if grade := requestedGrade(e); grade > 0 {
-				if err := placeholderTranscript(e.App, record.Id, grade); err != nil {
-					// The account exists and the link is about to go out.
-					// Losing the grade costs one form field, not the signup.
-					e.App.Logger().Error("Failed to store the grade from signup",
-						"error", err, "recordId", record.Id)
-				}
-			}
 		}
+
+		storeSignupGrade(e, record.Id)
 
 		e.Record = record
 
@@ -192,6 +188,25 @@ func requestedEmail(e *core.RecordCreateOTPRequestEvent) (string, error) {
 	return email, nil
 }
 
+// storeSignupGrade keeps the grade the signup form sent alongside the address.
+//
+// The form asks for both together, so the grade is stored with the account it
+// belongs to rather than carried through the email and applied afterwards. That
+// way nobody is asked for the same number twice.
+//
+// Failure is logged, not returned: the account exists and the link is about to
+// go out, so losing the grade costs one form field rather than the signup.
+func storeSignupGrade(e *core.RecordCreateOTPRequestEvent, userID string) {
+	grade := requestedGrade(e)
+	if grade <= 0 {
+		return
+	}
+
+	if err := placeholderTranscript(e.App, userID, grade); err != nil {
+		e.App.Logger().Error("Failed to store the grade from signup", "error", err, "recordId", userID)
+	}
+}
+
 // requestedGrade reads the grade the signup form sent alongside the address.
 //
 // PocketBase's own request-otp form ignores anything but the email, so this
@@ -222,7 +237,24 @@ func placeholderTranscript(app core.App, userID string, grade float64) error {
 		return err
 	}
 
+	// Replace the previous typed grade rather than stacking another: someone
+	// correcting a typo means to change their answer, not to claim two.
+	existing, err := app.FindRecordsByFilter(
+		"transcripts",
+		"user = {:user} && pdf = ''",
+		"-uploaded",
+		1,
+		0,
+		dbx.Params{"user": userID},
+	)
+	if err != nil {
+		return err
+	}
+
 	record := core.NewRecord(transcripts)
+	if len(existing) > 0 {
+		record = existing[0]
+	}
 	record.Set("user", userID)
 	record.Set("grade", grade)
 
