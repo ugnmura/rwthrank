@@ -5,7 +5,7 @@
   "hero": {
     "title": "Notenspiegel vergleichen",
     "subtitle": "Drei Angaben, dann siehst du deinen Platz in deinem Fach.",
-    "subtitleSignedIn": "Fach und Note fehlen noch. Danach siehst du deinen Platz."
+    "subtitleSignedIn": "Abschluss, Fach und Note fehlen noch. Danach siehst du deinen Platz."
   },
   "form": {
     "legend": "Registrieren",

@@ -12,7 +12,7 @@ import { useSyncExternalStore } from 'react'
  */
 const KEY = 'rwthrank.theme'
 
-export type ThemeChoice = 'system' | 'rwthrank' | 'rwthrank-dark'
+export type ThemeChoice = 'system' | 'rwth' | 'rwth-dark'
 
 const listeners = new Set<() => void>()
 
@@ -27,7 +27,7 @@ function subscribe(listener: () => void) {
 }
 
 function isChoice(value: unknown): value is ThemeChoice {
-  return value === 'system' || value === 'rwthrank' || value === 'rwthrank-dark'
+  return value === 'system' || value === 'rwth' || value === 'rwth-dark'
 }
 
 function getSnapshot(): ThemeChoice {

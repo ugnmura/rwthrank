@@ -7,8 +7,8 @@ import { applyTheme, useThemeChoice, type ThemeChoice } from './theme-toggle'
 
 const OPTIONS: { value: ThemeChoice; key: 'system' | 'light' | 'dark' }[] = [
   { value: 'system', key: 'system' },
-  { value: 'rwthrank', key: 'light' },
-  { value: 'rwthrank-dark', key: 'dark' },
+  { value: 'rwth', key: 'light' },
+  { value: 'rwth-dark', key: 'dark' },
 ]
 
 export function ThemeSwitcher() {

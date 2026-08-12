@@ -5,7 +5,7 @@
   "hero": {
     "title": "Compare your transcript",
     "subtitle": "Three entries, then you see your rank in your own subject.",
-    "subtitleSignedIn": "Subject and grade are still missing. Then you see your rank."
+    "subtitleSignedIn": "Degree, subject and grade are still missing. Then you see your rank."
   },
   "form": {
     "legend": "Register",
