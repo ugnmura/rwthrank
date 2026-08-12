@@ -73,7 +73,12 @@ func handleRank(e *core.RequestEvent) error {
 
 	// Grades are constrained to 1.0-5.0, so 0 is unreachable for a real one.
 	if grade == 0 {
-		return e.JSON(200, &response{Scope: scopeName(scoped), Total: total})
+		empty := &response{Scope: scopeName(scoped), Transcript: &mine.Id, Total: total}
+		if program != "" {
+			empty.Program, empty.Degree = &program, &degree
+		}
+
+		return e.JSON(200, empty)
 	}
 
 	better, err := count(e.App, program, degree, scoped, grade)
@@ -98,8 +103,16 @@ func handleRank(e *core.RequestEvent) error {
 		Total:      total,
 		Percentile: &percentile,
 	}
-	if scoped {
-		out.Program, out.Degree = &program, &degree
+
+	// The subject is reported whatever the ranking compared against. Scope
+	// already says which of the two happened, and blanking these while looking
+	// at everyone would tell the caller the transcript has no subject — leaving
+	// nothing to switch back to.
+	if program != "" {
+		out.Program = &program
+	}
+	if degree != "" {
+		out.Degree = &degree
 	}
 
 	return e.JSON(200, out)

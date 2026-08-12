@@ -31,8 +31,6 @@ export default function Home() {
   // the only source: a null grade there means nobody has entered one yet.
   const ranked = rank.data?.grade != null
   const showDashboard = !!user && ranked
-  // The subject only exists once a transcript named it.
-  const hasSubject = Boolean(rank.data?.program && rank.data?.degree)
 
   return (
     <div className="flex w-full flex-1 flex-col">
@@ -49,7 +47,7 @@ export default function Home() {
         {isPending ? (
           <div className="h-[104px]" aria-hidden />
         ) : showDashboard ? (
-          <Dashboard view={view} />
+          <Dashboard view={view} transcript={picked} />
         ) : (
           <>
             <p className="mb-4 font-mono text-[11px] tracking-[0.18em] text-base-content/35 uppercase">
@@ -74,9 +72,12 @@ export default function Home() {
           the transcript is the way to correct it. */}
       {showDashboard && (
         <section className="mx-auto w-full max-w-2xl space-y-8 px-6 pb-12 sm:px-10">
-          {hasSubject && (
-            <ScopeFilter view={view} onChange={setView} program={rank.data?.program ?? ''} />
-          )}
+          <ScopeFilter
+            view={view}
+            onChange={setView}
+            program={rank.data?.program}
+            degree={rank.data?.degree}
+          />
 
           <TranscriptList selected={rank.data?.transcript ?? undefined} onSelect={setPicked} />
 

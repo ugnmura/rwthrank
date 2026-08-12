@@ -1,6 +1,6 @@
 'use client'
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { useAuthRecord } from './auth'
 import { pb } from './pocketbase'
@@ -82,6 +82,10 @@ export function useRank(view: 'auto' | 'overall' = 'auto', transcript?: string) 
 
   return useQuery({
     queryKey: [...rankKey, user?.id, view, transcript],
+    // Switching the view changes the key, which would otherwise blank the data
+    // and unmount the whole dashboard: it reads as the page reloading. The old
+    // numbers stay put until the new ones arrive.
+    placeholderData: keepPreviousData,
     queryFn: () => {
       const params = new URLSearchParams()
       if (view === 'overall') params.set('scope', 'overall')
@@ -120,6 +124,8 @@ export function useSaveGrade() {
 
 /** Sends the PDF to be read. The answer is data, not a stored file. */
 export function useUploadTranscript() {
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: (file: File) => {
       const body = new FormData()
@@ -128,6 +134,13 @@ export function useUploadTranscript() {
       // No Content-Type here on purpose: only the browser knows the multipart
       // boundary it is about to write.
       return call('/api/transcript', { method: 'POST', body }) as Promise<Transcript>
+    },
+    // An upload writes a transcript, replaces any previous one for that subject
+    // and rewrites its modules, so both the list and the ranking are stale the
+    // moment it succeeds.
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: transcriptsKey })
+      queryClient.invalidateQueries({ queryKey: rankKey })
     },
   })
 }

@@ -10,10 +10,18 @@ import { useRank } from '@/lib/rank'
  * said twice on purpose: a rank without the field it was measured in is a number
  * people misread.
  */
-export function Dashboard({ view = 'auto' }: { view?: 'auto' | 'overall' }) {
+export function Dashboard({
+  view = 'auto',
+  transcript,
+}: {
+  view?: 'auto' | 'overall'
+  // Same arguments as the page's own call, so both read one cached query
+  // instead of two that can disagree about which transcript is being ranked.
+  transcript?: string
+}) {
   const t = useTranslations('dashboard')
   const format = useFormatter()
-  const { data, error, isFetching, refetch } = useRank(view)
+  const { data, error, isFetching, refetch } = useRank(view, transcript)
 
   // A grade keeps its tenth even when it is a round 2,0; a percentile drops it.
   const grade = (value: number) =>

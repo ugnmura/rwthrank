@@ -1,14 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useFormatter, useTranslations } from 'next-intl'
 
-import { useUploadTranscript } from '@/lib/rank'
+import { useTranscripts, useUploadTranscript } from '@/lib/rank'
 
 /**
- * Reading a transcript is a second, more accurate way to fill in the same two
- * fields. It stays an offer: the server hands back what it read, and the record
- * only changes if the user agrees with it.
+ * Uploading a Notenspiegel stores it and everything read from it.
+ *
+ * It is confirmed first, because an upload is not additive: a document for a
+ * subject that already has one replaces it, taking the old file and its modules
+ * with it. That is destructive enough to ask about, especially since the person
+ * cannot see which of their transcripts is about to go until it has been read.
  */
 export function TranscriptUpload() {
   const t = useTranslations('upload')
@@ -16,8 +19,14 @@ export function TranscriptUpload() {
 
   const [file, setFile] = useState<File | null>(null)
   const upload = useUploadTranscript()
+  const { data: existing } = useTranscripts()
+  const dialog = useRef<HTMLDialogElement>(null)
 
   const parsed = upload.data
+
+  // Only a stored document can be replaced; the placeholder a typed grade
+  // creates has no subject and never collides.
+  const replaceable = existing?.filter((item) => item.program) ?? []
 
   return (
     <section className="card card-border border-base-300 bg-base-200/40">
@@ -28,7 +37,15 @@ export function TranscriptUpload() {
         <form
           onSubmit={(event) => {
             event.preventDefault()
-            if (file) upload.mutate(file)
+            if (!file) return
+
+            // Nothing to lose on a first upload, so it does not ask.
+            if (replaceable.length === 0) {
+              upload.mutate(file)
+              return
+            }
+
+            dialog.current?.showModal()
           }}
         >
           <fieldset className="fieldset">
@@ -100,6 +117,42 @@ export function TranscriptUpload() {
           </div>
         )}
       </div>
+
+      {/* Native dialog, so Escape and the backdrop close it without extra code. */}
+      <dialog ref={dialog} className="modal">
+        <div className="modal-box">
+          <h3 className="text-lg font-bold">{t('confirmTitle')}</h3>
+          <p className="py-3 text-sm leading-relaxed text-base-content/70">
+            {t('confirmBody')}
+          </p>
+          <ul className="mb-2 list-disc space-y-1 pl-5 text-sm text-base-content/70">
+            {replaceable.map((item) => (
+              <li key={item.id}>
+                {item.program} · {item.degree}
+              </li>
+            ))}
+          </ul>
+
+          <div className="modal-action">
+            <form method="dialog">
+              <button className="btn btn-ghost btn-sm">{t('cancel')}</button>
+            </form>
+            <button
+              type="button"
+              onClick={() => {
+                dialog.current?.close()
+                if (file) upload.mutate(file)
+              }}
+              className="btn btn-primary btn-sm"
+            >
+              {t('confirm')}
+            </button>
+          </div>
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button>{t('cancel')}</button>
+        </form>
+      </dialog>
     </section>
   )
 }

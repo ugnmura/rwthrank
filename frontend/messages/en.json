@@ -70,7 +70,11 @@
     "creditsValue": "{credits} of {maxCredits}",
     "modules": "Modules",
     "applied": "Saved. Your rank is up to date.",
-    "degree": "Degree"
+    "degree": "Degree",
+    "confirmTitle": "Replace a transcript?",
+    "confirmBody": "If the new transcript is for the same subject and degree, it replaces the stored one. The old file and every grade read from it are deleted. An older document is refused. Affects:",
+    "confirm": "Replace",
+    "cancel": "Cancel"
   },
   "curve": {
     "alt": "Distribution of grades from 1.0 to 5.0. The largest share is at 2.3.",
@@ -143,7 +147,10 @@
     "saving": "Saving",
     "viewLabel": "View",
     "viewSubject": "{program} only",
-    "viewAll": "All subjects"
+    "viewAll": "All subjects",
+    "viewSubjectDegree": "{program} · {degree} only",
+    "viewSubjectUnset": "My subject only",
+    "viewHint": "Set a degree and subject above to compare inside your own subject."
   },
   "transcripts": {
     "label": "Your transcripts",

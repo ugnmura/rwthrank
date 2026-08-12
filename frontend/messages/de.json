@@ -70,7 +70,11 @@
     "creditsValue": "{credits} von {maxCredits}",
     "modules": "Module",
     "applied": "Gespeichert. Deine Platzierung ist aktualisiert.",
-    "degree": "Abschluss"
+    "degree": "Abschluss",
+    "confirmTitle": "Notenspiegel ersetzen?",
+    "confirmBody": "Wenn der neue Notenspiegel zum selben Fach und Abschluss gehört, ersetzt er den gespeicherten. Die alte Datei und alle Noten daraus werden dabei gelöscht. Ein älteres Dokument wird abgelehnt. Betrifft:",
+    "confirm": "Ersetzen",
+    "cancel": "Abbrechen"
   },
   "curve": {
     "alt": "Verteilung der Noten von 1,0 bis 5,0. Der größte Anteil liegt bei 2,3.",
@@ -143,7 +147,10 @@
     "saving": "Wird gespeichert",
     "viewLabel": "Ansicht",
     "viewSubject": "Nur {program}",
-    "viewAll": "Alle Fächer"
+    "viewAll": "Alle Fächer",
+    "viewSubjectDegree": "Nur {program} · {degree}",
+    "viewSubjectUnset": "Nur mein Fach",
+    "viewHint": "Stell oben Abschluss und Fach ein, dann kannst du auch nur dein Fach vergleichen."
   },
   "transcripts": {
     "label": "Deine Notenspiegel",
