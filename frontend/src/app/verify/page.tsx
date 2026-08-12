@@ -1,7 +1,7 @@
 'use client'
 
-import { Suspense, useEffect, useRef, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useQueryClient } from '@tanstack/react-query'
 
@@ -9,41 +9,36 @@ import { pb } from '@/lib/pocketbase'
 import { takePending } from '@/lib/pending'
 import { LocaleSwitcher } from '../locale-switcher'
 
-export default function VerifyPage() {
-  return (
-    <Suspense fallback={null}>
-      <Verify />
-    </Suspense>
-  )
-}
-
 type State = 'checking' | 'done' | 'failed'
 
-function Verify() {
+export default function VerifyPage() {
   const t = useTranslations('verify')
   const router = useRouter()
-  const params = useSearchParams()
   const queryClient = useQueryClient()
 
-  // A link missing either half is decided here rather than in the effect: it is
-  // knowable at render, and nothing needs to be attempted to find out.
-  const id = params.get('id')
-  const code = params.get('code')
-  const complete = Boolean(id && code)
-
-  const [state, setState] = useState<State>(complete ? 'checking' : 'failed')
-  const [message, setMessage] = useState(complete ? '' : t('linkIncomplete'))
+  // The token rides in the fragment, which never reaches the server and so is
+  // only readable after mount. Starts optimistic; a malformed link falls
+  // through to the failure state below.
+  const [state, setState] = useState<State>('checking')
+  const [message, setMessage] = useState('')
 
   // The link is single-use, so redeeming it twice fails. React runs effects
   // twice in development, which would do exactly that.
   const redeemed = useRef(false)
 
   useEffect(() => {
-    if (!id || !code) return
     if (redeemed.current) return
     redeemed.current = true
 
+    const [id, code] = window.location.hash.replace(/^#/, '').split('.')
+
     const run = async () => {
+      if (!id || !code) {
+        setState('failed')
+        setMessage(t('linkIncomplete'))
+        return
+      }
+
       try {
         await pb.collection('users').authWithOTP(id, code)
 
@@ -68,7 +63,7 @@ function Verify() {
     }
 
     void run()
-  }, [id, code, queryClient, t])
+  }, [queryClient, t])
 
   return (
     <div className="flex w-full flex-1 flex-col">

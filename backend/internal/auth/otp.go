@@ -53,8 +53,18 @@ func sendMagicLink(app *pocketbase.PocketBase) {
 			return e.Next()
 		}
 
-		link := fmt.Sprintf("%s/verify?id=%s&code=%s",
-			base, url.QueryEscape(otpID), url.QueryEscape(code))
+		// The pair goes in the fragment, not the query string.
+		//
+		// A query string needs "=" and "&", and quoted-printable treats a
+		// trailing "=" as a soft line break. This href is past the 76 character
+		// limit, so the wrap landed on "code=" and turned it into a tab: the
+		// link arrived broken in a real inbox while working locally, where the
+		// host was short enough not to wrap. A fragment has neither character.
+		//
+		// It also never leaves the browser, so the code stays out of server
+		// logs and Referer headers.
+		link := fmt.Sprintf("%s/verify#%s.%s",
+			base, url.PathEscape(otpID), url.PathEscape(code))
 
 		// German only for now: the request carries no locale, and the audience
 		// reads German. Worth threading a locale through when that stops holding.
