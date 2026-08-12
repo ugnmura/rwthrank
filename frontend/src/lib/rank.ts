@@ -289,6 +289,7 @@ export type CompareFilters = {
 
 export type Comparison = {
   average: number | null
+  official: boolean
   credits: number
   courses: number
   rank: number | null

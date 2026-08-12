@@ -173,7 +173,8 @@
     "passed": "passed",
     "ungradedPass": "Passed without a grade",
     "standing": "Rank {rank} of {total} · top {percentile} %",
-    "noStanding": "No comparison for this class yet."
+    "noStanding": "No comparison for this class yet.",
+    "compareThis": "Open on the compare page"
   },
   "settings": {
     "title": "Settings",
@@ -219,6 +220,11 @@
     "ownProgramOnly": "My field of study and degree only",
     "classes": "Individual classes",
     "classesHint": "Pick which classes the average runs over. None selected counts them all.",
-    "clearClasses": "Clear selection"
+    "clearClasses": "Clear selection",
+    "searchClasses": "Search for a class …",
+    "noMatches": "No class found.",
+    "removeClass": "Remove {name}",
+    "official": "Overall grade as printed on your transcript",
+    "computed": "Computed from the classes you selected"
   }
 }

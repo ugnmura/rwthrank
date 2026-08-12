@@ -42,9 +42,12 @@ type compareBody struct {
 }
 
 type compareResponse struct {
-	Average       *float64 `json:"average"`
-	Credits       float64  `json:"credits"`
-	Courses       int      `json:"courses"`
+	Average *float64 `json:"average"`
+	Credits float64  `json:"credits"`
+	Courses int      `json:"courses"`
+	// Official marks the figure as the Gesamtnote printed on the document
+	// rather than one computed from the classes, which are not the same thing.
+	Official      bool     `json:"official"`
 	Rank          *int64   `json:"rank"`
 	Total         int64    `json:"total"`
 	Percentile    *float64 `json:"percentile"`
@@ -64,6 +67,15 @@ func handleCompare(e *core.RequestEvent) error {
 			return e.InternalServerError("Failed to work out your semester.", err)
 		}
 		body.StudySemester = current
+	}
+
+	// With nothing narrowed, the honest answer is the number the university
+	// printed. RWTH computes a Gesamtnote over the Modulbereich totals, not the
+	// individual classes, so averaging the classes gives a different figure —
+	// 1.48 against a printed 1.6 on the sample. Recomputing it would put a
+	// number on screen that contradicts the student's own transcript.
+	if unfiltered(body) {
+		return officialAverage(e)
 	}
 
 	where, params := filters(body)
@@ -215,4 +227,72 @@ func filters(body compareBody) (string, dbx.Params) {
 
 func registerCompareRoute(se *core.ServeEvent) {
 	se.Router.POST(comparePath, handleCompare).Bind(apis.RequireAuth())
+}
+
+// unfiltered reports whether the request narrows anything at all.
+func unfiltered(body compareBody) bool {
+	return len(body.Courses) == 0 &&
+		len(body.Semesters) == 0 &&
+		body.MinCredits == 0 &&
+		body.MaxCredits == 0 &&
+		body.StudySemester < 0
+}
+
+// officialAverage answers with the printed Gesamtnote and ranks it the way the
+// dashboard does, so the two screens never disagree about the same number.
+func officialAverage(e *core.RequestEvent) error {
+	mine, err := latestTranscript(e.App, e.Auth.Id)
+	if err != nil || mine == nil {
+		return e.JSON(http.StatusOK, &compareResponse{})
+	}
+
+	grade := mine.GetFloat("grade")
+	credits := mine.GetFloat("credits")
+	if grade == 0 {
+		return e.JSON(http.StatusOK, &compareResponse{Credits: credits})
+	}
+
+	var totals struct {
+		Total  int64   `db:"total"`
+		Better int64   `db:"better"`
+		Cohort float64 `db:"cohort"`
+	}
+	err = e.App.DB().
+		NewQuery(`SELECT COUNT(*) AS total,
+		                 SUM(CASE WHEN t.grade < {:mine} THEN 1 ELSE 0 END) AS better,
+		                 AVG(t.grade) AS cohort
+		          FROM transcripts t
+		          WHERE t.grade IS NOT NULL
+		            AND t.id = (SELECT id FROM transcripts WHERE user = t.user ORDER BY uploaded DESC LIMIT 1)`).
+		Bind(dbx.Params{"mine": grade}).
+		One(&totals)
+	if err != nil {
+		return e.InternalServerError("Failed to compare.", err)
+	}
+
+	rank := totals.Better + 1
+	percentile := math.Round(float64(rank)/float64(totals.Total)*1000) / 10
+
+	return e.JSON(http.StatusOK, &compareResponse{
+		Average:       &grade,
+		Credits:       credits,
+		Official:      true,
+		Rank:          &rank,
+		Total:         totals.Total,
+		Percentile:    &percentile,
+		CohortAverage: &totals.Cohort,
+	})
+}
+
+// latestTranscript is the caller's most recent document.
+func latestTranscript(app core.App, userID string) (*core.Record, error) {
+	found, err := app.FindRecordsByFilter(
+		"transcripts", "user = {:user}", "-uploaded", 1, 0,
+		dbx.Params{"user": userID},
+	)
+	if err != nil || len(found) == 0 {
+		return nil, err
+	}
+
+	return found[0], nil
 }

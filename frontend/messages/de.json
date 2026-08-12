@@ -173,7 +173,8 @@
     "passed": "bestanden",
     "ungradedPass": "Bestanden ohne Note",
     "standing": "Platz {rank} von {total} · Top {percentile} %",
-    "noStanding": "Für diese Veranstaltung gibt es noch keinen Vergleich."
+    "noStanding": "Für diese Veranstaltung gibt es noch keinen Vergleich.",
+    "compareThis": "Auf der Vergleichsseite öffnen"
   },
   "settings": {
     "title": "Einstellungen",
@@ -219,6 +220,11 @@
     "ownProgramOnly": "Nur mein Fach und Abschluss",
     "classes": "Einzelne Fächer",
     "classesHint": "Wähl aus, über welche Fächer gerechnet wird. Ohne Auswahl zählen alle.",
-    "clearClasses": "Auswahl aufheben"
+    "clearClasses": "Auswahl aufheben",
+    "searchClasses": "Fach suchen …",
+    "noMatches": "Kein Fach gefunden.",
+    "removeClass": "{name} entfernen",
+    "official": "Gesamtnote laut Notenspiegel",
+    "computed": "Aus den ausgewählten Fächern berechnet"
   }
 }
