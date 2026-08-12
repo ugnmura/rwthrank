@@ -8,6 +8,7 @@ import { useAuthRecord } from '@/lib/auth'
 import { AuthButton } from './auth-button'
 import { LocaleSwitcher } from './locale-switcher'
 import { ThemeSwitcher } from './theme-switcher'
+import { Breadcrumbs } from './breadcrumbs'
 
 /**
  * The header every page shares, including the navigation between them.
@@ -28,6 +29,7 @@ export function SiteHeader() {
   ]
 
   return (
+    <>
     <header className="mx-auto flex w-full max-w-2xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-6 pt-8 font-mono text-[11px] tracking-[0.18em] uppercase sm:px-10">
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
         <Link href="/" className="text-base-content/70 hover:underline">
@@ -57,5 +59,7 @@ export function SiteHeader() {
         <AuthButton />
       </div>
     </header>
+    <Breadcrumbs />
+    </>
   )
 }

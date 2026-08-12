@@ -62,12 +62,11 @@ export function TranscriptList({
               item.id === selected ? 'border-primary' : 'border-base-300'
             }`}
           >
-            <div className="flex flex-wrap items-center justify-between gap-3">
-            <button
-              type="button"
+            <div
               onClick={() => setOpen(open === item.id ? undefined : item.id)}
-              className="min-w-0 text-left"
+              className="flex cursor-pointer flex-wrap items-center justify-between gap-3"
             >
+            <div className="min-w-0">
               <p className="font-medium">
                 {item.program || t('unknownProgram')}
                 {item.degree ? ` · ${item.degree}` : ''}
@@ -79,11 +78,15 @@ export function TranscriptList({
                   maxCredits: format.number(item.maxCredits),
                 })}
               </p>
-            </button>
+            </div>
 
             <button
               type="button"
-              onClick={() => ask(item)}
+              // The row toggles; deleting must not do both.
+              onClick={(event) => {
+                event.stopPropagation()
+                ask(item)
+              }}
               aria-label={t('deleteOne', { program: item.program || t('unknownProgram') })}
               title={t('delete')}
               className="btn btn-sm btn-ghost text-base-content/50 hover:text-error"

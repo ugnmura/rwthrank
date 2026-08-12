@@ -26,7 +26,6 @@ export function CompareSection() {
   const params = useSearchParams()
   const [semester, setSemester] = useState(params.get('semester') ?? '')
   const [picked, setPicked] = useState<string[]>(params.getAll('course'))
-  const [ownProgram, setOwnProgram] = useState(params.get('cohort') !== 'all')
 
   // Built from what the person actually has, so no filter can select nothing.
   const { semesters, courses } = useMemo(() => {
@@ -51,7 +50,6 @@ export function CompareSection() {
     studySemester: -1,
     semesters: semester ? [semester] : undefined,
     courses: picked.length ? picked : undefined,
-    ...(ownProgram ? {} : { program: '', degree: '' }),
   }
 
   const { data, isFetching } = useComparison(filters)
@@ -136,17 +134,6 @@ export function CompareSection() {
             </Field>
 
 
-            <Field label={t('cohort')} hint={t('cohortHint')}>
-              <label className="label cursor-pointer justify-start gap-3">
-                <input
-                  type="checkbox"
-                  checked={ownProgram}
-                  onChange={(event) => setOwnProgram(event.target.checked)}
-                  className="checkbox checkbox-sm"
-                />
-                <span className="label-text">{t('ownProgramOnly')}</span>
-              </label>
-            </Field>
 
             <Field label={t('classes')} hint={t('classesHint')}>
               <ClassPicker courses={courses} picked={picked} onChange={setPicked} />

@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useFormatter, useLocale, useTranslations } from 'next-intl'
 
 import { useResults } from '@/lib/rank'
@@ -16,6 +17,7 @@ export function TranscriptModules({ transcript }: { transcript: string }) {
   const format = useFormatter()
   const locale = useLocale()
   const { data: results, isPending } = useResults(transcript)
+  const router = useRouter()
 
   if (isPending) {
     return (
@@ -47,7 +49,13 @@ export function TranscriptModules({ transcript }: { transcript: string }) {
         </thead>
         <tbody>
           {results.map((row) => (
-            <tr key={row.id} className="hover:bg-base-200">
+            // Anywhere on the row opens the comparison; the name stays a real
+            // link so it can be middle-clicked or copied.
+            <tr
+              key={row.id}
+              onClick={() => router.push(`/dashboard/compare?course=${row.course}&studySemester=-1`)}
+              className="cursor-pointer hover:bg-base-200"
+            >
               {/* The document names every class twice; show the half the
                   reader asked for, falling back when it was never read. */}
               <td>

@@ -104,7 +104,8 @@
     "upload": "Hochladen",
     "account": "Konto",
     "settings": "Einstellungen",
-    "compare": "Vergleichen"
+    "compare": "Vergleichen",
+    "verify": "Bestätigung"
   },
   "legal": {
     "title": "Impressum und Datenschutz",
@@ -206,9 +207,6 @@
     "calendarSemester": "Kalendersemester",
     "calendarSemesterHint": "Ein bestimmtes Semester wie 24S oder 23W.",
     "anySemester": "Alle",
-    "cohort": "Vergleichsgruppe",
-    "cohortHint": "Ohne Haken wird mit allen Fächern verglichen.",
-    "ownProgramOnly": "Nur mein Fach und Abschluss",
     "classes": "Einzelne Fächer",
     "classesHint": "Wähl aus, über welche Fächer gerechnet wird. Ohne Auswahl zählen alle.",
     "clearClasses": "Auswahl aufheben",
