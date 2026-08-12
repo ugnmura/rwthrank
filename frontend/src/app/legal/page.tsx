@@ -1,11 +1,9 @@
 'use client'
 
-import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 
-import { LocaleSwitcher } from '../locale-switcher'
-import { ThemeSwitcher } from '../theme-switcher'
-import { AuthButton } from '../auth-button'
+import { SiteHeader } from '../site-header'
+
 
 /**
  * Impressum and Datenschutzerklärung on one page.
@@ -22,16 +20,7 @@ export default function LegalPage() {
 
   return (
     <div className="flex w-full flex-1 flex-col">
-      <header className="mx-auto flex w-full max-w-2xl items-center justify-between gap-4 px-6 pt-8 font-mono text-[11px] tracking-[0.18em] uppercase sm:px-10">
-        <Link href="/" className="text-base-content/70 hover:underline">
-          rwthrank
-        </Link>
-        <div className="flex items-center gap-4">
-          <ThemeSwitcher />
-          <LocaleSwitcher />
-          <AuthButton />
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-12 sm:px-10">
         <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">

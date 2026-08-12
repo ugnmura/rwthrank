@@ -3,10 +3,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
+
+import { SiteHeader } from '../site-header'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { pb } from '@/lib/pocketbase'
-import { LocaleSwitcher } from '../locale-switcher'
 
 type State = 'checking' | 'done' | 'failed'
 
@@ -56,10 +57,7 @@ export default function VerifyPage() {
 
   return (
     <div className="flex w-full flex-1 flex-col">
-      <header className="mx-auto flex w-full max-w-2xl items-baseline justify-between px-6 pt-8 font-mono text-[11px] tracking-[0.18em] uppercase sm:px-10">
-        <span className="text-base-content/70">rwthrank</span>
-        <LocaleSwitcher />
-      </header>
+      <SiteHeader />
 
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-6 py-12 sm:px-10">
         {state === 'checking' && (

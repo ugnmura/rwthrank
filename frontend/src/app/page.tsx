@@ -1,53 +1,42 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 
 import { useAuthRecord } from '@/lib/auth'
-import { useRank, type Profile } from '@/lib/rank'
-import { Dashboard } from './dashboard'
+import { useRank } from '@/lib/rank'
 import { GradeCurve } from './grade-curve'
-import Link from 'next/link'
-
-import { LocaleSwitcher } from './locale-switcher'
-import { ThemeSwitcher } from './theme-switcher'
-import { AuthButton } from './auth-button'
-import { ScopeFilter } from './scope-filter'
-import { TranscriptList } from './transcript-list'
 import { RegisterForm } from './register-form'
-import { TranscriptUpload } from './transcript-upload'
+import { SiteHeader } from './site-header'
 
+/**
+ * The front page: what this is, and the form that gets you in.
+ *
+ * Anyone already signed in with a grade belongs on their dashboard, so this
+ * hands them over rather than showing a second copy of it. Someone signed in
+ * without a grade stays, because the form is what they still need.
+ */
 export default function Home() {
   const t = useTranslations()
-  const { data, isPending } = useAuthRecord()
-  // The generated record type has no program or grade yet — see Profile.
-  const user = data as Profile | null | undefined
-  const [view, setView] = useState<'auto' | 'overall'>('auto')
-  // Which transcript is being ranked; unset means the newest.
-  const [picked, setPicked] = useState<string>()
-  const rank = useRank(view, picked)
+  const { data: user, isPending } = useAuthRecord()
+  const rank = useRank()
+  const router = useRouter()
 
-  // The account carries nothing to fall back on any more, so the endpoint is
-  // the only source: a null grade there means nobody has entered one yet.
   const ranked = rank.data?.grade != null
-  const showDashboard = !!user && ranked
+
+  useEffect(() => {
+    if (user && ranked) router.replace('/dashboard')
+  }, [user, ranked, router])
 
   return (
     <div className="flex w-full flex-1 flex-col">
-      <header className="mx-auto flex w-full max-w-2xl items-center justify-between px-6 pt-8 font-mono text-[11px] tracking-[0.18em] uppercase sm:px-10">
-        <span className="text-base-content/70">rwthrank</span>
-        <div className="flex items-center gap-4">
-          <ThemeSwitcher />
-          <LocaleSwitcher />
-          <AuthButton />
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-6 py-12 sm:px-10">
         {isPending ? (
           <div className="h-[104px]" aria-hidden />
-        ) : showDashboard ? (
-          <Dashboard view={view} transcript={picked} />
         ) : (
           <>
             <p className="mb-4 font-mono text-[11px] tracking-[0.18em] text-base-content/35 uppercase">
@@ -65,30 +54,12 @@ export default function Home() {
             </div>
           </>
         )}
-
       </main>
-
-      {/* Below the ranking on purpose: the number is what the page is for, and
-          the transcript is the way to correct it. */}
-      {showDashboard && (
-        <section className="mx-auto w-full max-w-2xl space-y-8 px-6 pb-12 sm:px-10">
-          <ScopeFilter
-            view={view}
-            onChange={setView}
-            program={rank.data?.program}
-            degree={rank.data?.degree}
-          />
-
-          <TranscriptList selected={rank.data?.transcript ?? undefined} onSelect={setPicked} />
-
-          <TranscriptUpload />
-        </section>
-      )}
 
       <footer className="w-full px-6 pb-8 sm:px-10">
         {/* Full-bleed on purpose: the distribution is the floor the landing page
             stands on. Once there is a real ranking it has nothing left to say. */}
-        {!showDashboard && <GradeCurve />}
+        <GradeCurve />
         <Link
           href="/legal"
           className="mt-6 inline-block font-mono text-[11px] tracking-[0.18em] text-base-content/40 uppercase underline-offset-4 hover:text-base-content/70 hover:underline"
@@ -99,4 +70,3 @@ export default function Home() {
     </div>
   )
 }
-

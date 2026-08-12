@@ -106,7 +106,10 @@
   "nav": {
     "legal": "Impressum & Datenschutz",
     "signIn": "Anmelden",
-    "signOut": "Abmelden"
+    "signOut": "Abmelden",
+    "dashboard": "Platzierung",
+    "transcripts": "Notenspiegel",
+    "upload": "Hochladen"
   },
   "legal": {
     "title": "Impressum und Datenschutz",

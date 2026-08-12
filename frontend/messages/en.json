@@ -106,7 +106,10 @@
   "nav": {
     "legal": "Legal notice & privacy",
     "signIn": "Sign in",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "dashboard": "Rank",
+    "transcripts": "Transcripts",
+    "upload": "Upload"
   },
   "legal": {
     "title": "Legal notice and privacy",
