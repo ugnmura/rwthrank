@@ -11,7 +11,7 @@ import type { UsersResponse } from '@/types/pocketbase'
  * yet in the generated types, so they are spelled out here until the next
  * `bun run typegen` picks them up.
  */
-export type Profile = UsersResponse & { program?: string; grade?: number }
+export type Profile = UsersResponse & { program?: string; degree?: string; grade?: number }
 
 /** `GET /api/rank`. Everything but `total` is null until the user has a grade. */
 export type RankSummary = {
@@ -25,6 +25,7 @@ export type RankSummary = {
 /** `POST /api/transcript`. What the server read out of the PDF, nothing stored. */
 export type Transcript = {
   program: string
+  degree: string
   grade: number
   credits: number
   maxCredits: number
@@ -80,7 +81,7 @@ export function useRank() {
 }
 
 /**
- * Writes program and grade onto the caller's own record — the users collection
+ * Writes program, degree and grade onto the caller's own record — the users collection
  * allows exactly that, and nothing else on the record is touched. The SDK folds
  * the response back into `pb.authStore`, so `useAuthRecord` sees it too.
  */
@@ -88,12 +89,12 @@ export function useSaveProfile() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ program, grade }: { program: string; grade: number }) => {
+    mutationFn: ({ program, degree, grade }: { program: string; degree: string; grade: number }) => {
       const record = pb.authStore.record
       // Unreachable from the UI: every caller runs behind a session.
       if (!record) throw new Error('no session')
 
-      return pb.collection('users').update(record.id, { program, grade })
+      return pb.collection('users').update(record.id, { program, degree, grade })
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: rankKey }),
   })

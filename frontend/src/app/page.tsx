@@ -6,7 +6,10 @@ import { useAuthRecord, useLogout } from '@/lib/auth'
 import { useRank, type Profile } from '@/lib/rank'
 import { Dashboard } from './dashboard'
 import { GradeCurve } from './grade-curve'
+import Link from 'next/link'
+
 import { LocaleSwitcher } from './locale-switcher'
+import { ThemeSwitcher } from './theme-switcher'
 import { RegisterForm } from './register-form'
 import { TranscriptUpload } from './transcript-upload'
 
@@ -27,7 +30,10 @@ export default function Home() {
     <div className="flex w-full flex-1 flex-col">
       <header className="mx-auto flex w-full max-w-2xl items-baseline justify-between px-6 pt-8 font-mono text-[11px] tracking-[0.18em] uppercase sm:px-10">
         <span className="text-base-content/70">rwthrank</span>
-        <LocaleSwitcher />
+        <div className="flex items-baseline gap-4">
+          <ThemeSwitcher />
+          <LocaleSwitcher />
+        </div>
       </header>
 
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-6 py-12 sm:px-10">
@@ -67,6 +73,12 @@ export default function Home() {
       {/* Full-bleed on purpose: the distribution is the floor the page stands on. */}
       <footer className="w-full px-6 pb-8 sm:px-10">
         <GradeCurve />
+        <Link
+          href="/legal"
+          className="mt-6 inline-block font-mono text-[11px] tracking-[0.18em] text-base-content/40 uppercase underline-offset-4 hover:text-base-content/70 hover:underline"
+        >
+          {t('nav.legal')}
+        </Link>
       </footer>
     </div>
   )

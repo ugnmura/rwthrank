@@ -78,6 +78,7 @@ export function TranscriptUpload() {
 
             <dl className="mt-3 space-y-1.5 text-sm">
               <Row label={t('program')} value={parsed.program} />
+              <Row label={t('degree')} value={parsed.degree} />
               <Row
                 label={t('grade')}
                 value={format.number(parsed.grade, {
@@ -102,7 +103,13 @@ export function TranscriptUpload() {
             ) : (
               <button
                 type="button"
-                onClick={() => apply.mutate({ program: parsed.program, grade: parsed.grade })}
+                onClick={() =>
+                  apply.mutate({
+                    program: parsed.program,
+                    degree: parsed.degree,
+                    grade: parsed.grade,
+                  })
+                }
                 disabled={apply.isPending}
                 className="btn btn-secondary mt-4"
               >

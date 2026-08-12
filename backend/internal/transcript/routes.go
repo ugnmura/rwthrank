@@ -16,7 +16,7 @@ const (
 	// uploadPath takes a Notenspiegel and answers with its numbers.
 	//
 	//	POST /api/transcript   multipart/form-data, field "file"
-	//	-> {"program":"Maschinenbau","grade":2.3,"credits":96,"maxCredits":180,"moduleCount":17}
+	//	-> {"program":"Maschinenbau","degree":"Bachelor","grade":2.3,"credits":96,"maxCredits":180,"moduleCount":17}
 	uploadPath = "/api/transcript"
 
 	// fileField is the multipart field the PDF arrives in.
@@ -31,6 +31,7 @@ const (
 // frontend is written against; do not rename them.
 type uploadResult struct {
 	Program     string  `json:"program"`
+	Degree      string  `json:"degree"`
 	Grade       float64 `json:"grade"`
 	Credits     float64 `json:"credits"`
 	MaxCredits  float64 `json:"maxCredits"`
@@ -93,6 +94,7 @@ func handleUpload(e *core.RequestEvent) error {
 
 	return e.JSON(http.StatusOK, uploadResult{
 		Program:     parsed.Program,
+		Degree:      parsed.Degree,
 		Grade:       parsed.Grade,
 		Credits:     parsed.Credits,
 		MaxCredits:  parsed.MaxCredits,

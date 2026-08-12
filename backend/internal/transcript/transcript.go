@@ -36,6 +36,7 @@ var ErrNotNotenspiegel = errors.New("not an RWTH Notenspiegel")
 // Transcript is the summary of a Notenspiegel plus every module it lists.
 type Transcript struct {
 	Program    string   // e.g. "Maschinenbau"
+	Degree     string   // "Bachelor" or "Master", empty when the line does not say
 	Grade      float64  // Gesamtnote, e.g. 2.3
 	Credits    float64  // Gesamtcredits earned so far
 	MaxCredits float64  // credits the programme requires
@@ -137,8 +138,12 @@ func parseLines(lines []Line) (*Transcript, error) {
 		switch {
 		case wantProgram:
 			// The label sits above its value and the value line is shared with
-			// the degree, so the programme is the first column one line down.
+			// the degree, so the programme is the first column one line down and
+			// the awarded degree is the second.
 			t.Program, wantProgram = first, false
+			if len(line.Cells) > 1 {
+				t.Degree = degreeOf(line.Cells[1])
+			}
 			continue
 
 		case t.Program == "" && strings.HasPrefix(first, programLabel):
@@ -282,6 +287,24 @@ func parseRow(cells []string) (tableRow, bool) {
 	}
 
 	return row, true
+}
+
+// degreeOf reads the degree out of the line the programme shares.
+//
+// The cell spells out the full award ("Bachelor of Science RWTH Aachen
+// University"), and only the level matters for ranking, since a Master intake is
+// already filtered on its Bachelor result.
+func degreeOf(cell string) string {
+	lower := strings.ToLower(cell)
+
+	switch {
+	case strings.Contains(lower, "master"):
+		return "Master"
+	case strings.Contains(lower, "bachelor"):
+		return "Bachelor"
+	default:
+		return ""
+	}
 }
 
 // modules picks the individual modules out of the table.

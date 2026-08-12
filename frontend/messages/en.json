@@ -30,7 +30,9 @@
     "reveal": "Show my rank",
     "gradeInvalid": "Enter a grade between 1.0 and 5.0.",
     "sentLabel": "Email on its way",
-    "sentBody": "Open the link in the email and you'll see your rank. The link is good for five minutes."
+    "sentBody": "Open the link in the email and you'll see your rank. The link is good for five minutes.",
+    "degreeLabel": "Degree",
+    "degreePlaceholder": "Choose degree"
   },
   "signedIn": {
     "label": "Signed in",
@@ -67,7 +69,8 @@
     "modules": "Modules",
     "apply": "Apply subject and grade",
     "applying": "Applying",
-    "applied": "Applied. Your rank is up to date."
+    "applied": "Applied. Your rank is up to date.",
+    "degree": "Degree"
   },
   "curve": {
     "alt": "Distribution of grades from 1.0 to 5.0. The largest share is at 2.3.",
@@ -87,5 +90,44 @@
     "linkIncomplete": "The link is missing something. Request a new email.",
     "linkFailed": "The link has expired or was already used.",
     "startOver": "Start over"
+  },
+  "theme": {
+    "label": "Appearance",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "nav": {
+    "legal": "Legal notice & privacy"
+  },
+  "legal": {
+    "title": "Legal notice and privacy",
+    "imprintTitle": "Legal notice (Impressum)",
+    "imprintBody": "Information under § 5 DDG:\n\n[YOUR NAME]\n[STREET AND NUMBER]\n[POSTCODE AND CITY]\nGermany\n\nContact: kontakt@rwthrank.mindevice.net",
+    "controllerTitle": "Data controller",
+    "controllerBody": "The controller under the GDPR is the person named above. Privacy questions go to the same address.",
+    "dataTitle": "What is processed",
+    "dataBody": "rwthrank stores as little as it can. Specifically:",
+    "dataEmail": "Your email address. It is your account and the way the sign-in link reaches you.",
+    "dataProfile": "Subject, degree and overall grade. There is no ranking without them.",
+    "dataTranscript": "An uploaded transcript is read in memory and then discarded. The file is never stored. Only subject, degree and grade are kept.",
+    "dataLogs": "Server logs with IP address and timestamp, as any website produces.",
+    "basisTitle": "Legal basis",
+    "basisBody": "Your email address is processed under Art. 6(1)(b) GDPR, as it is necessary to provide the account. Subject, degree and grade are given voluntarily under Art. 6(1)(a) GDPR. You can withdraw that consent at any time by asking for your account to be deleted.",
+    "processorsTitle": "Services involved",
+    "processorsBody": "Running the site involves these providers:",
+    "processorHetzner": "Hetzner Online GmbH, Germany: server and database.",
+    "processorCloudflare": "Cloudflare, Inc.: DNS and forwarding of email to the operator. Processing also in the USA.",
+    "processorGithub": "GitHub, Inc. (Microsoft): serving the site via GitHub Pages. Processing also in the USA.",
+    "processorResend": "Resend, Inc.: sending the sign-in emails, processed in the EU (Ireland).",
+    "storageTitle": "Storage in your browser",
+    "storageBody": "No advertising or analytics cookies are set. Your browser's local storage holds only your session token and your language and appearance settings. Sign-in does not work without them, so no consent is required.",
+    "retentionTitle": "How long data is kept",
+    "retentionBody": "Your account and entries are kept until you ask for deletion. Sign-in codes expire after five minutes and are deleted as soon as they are used.",
+    "rightsTitle": "Your rights",
+    "rightsBody": "You have the right to access, rectification, erasure, restriction of processing, data portability and objection. An informal email to the address above is enough. You may also complain to a data protection authority; in North Rhine-Westphalia that is the LDI NRW.",
+    "trackingTitle": "No tracking",
+    "trackingBody": "rwthrank uses no analytics, no profiling and no ad networks. That is why there is no cookie banner.",
+    "updated": "Last updated August 2026. This is a general template and is not legal advice."
   }
 }

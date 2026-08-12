@@ -6,7 +6,7 @@ import { useFormatter, useTranslations } from 'next-intl'
 import { useRequestOtp } from '@/lib/auth'
 import { useSaveProfile } from '@/lib/rank'
 import { savePending } from '@/lib/pending'
-import { parseGrade, PROGRAMS } from '@/lib/study'
+import { DEGREES, parseGrade, PROGRAMS } from '@/lib/study'
 
 /**
  * Registration in one form: address, subject, grade, one button.
@@ -22,6 +22,7 @@ export function RegisterForm({ signedInEmail }: { signedInEmail?: string }) {
 
   const [email, setEmail] = useState('')
   const [program, setProgram] = useState('')
+  const [degree, setDegree] = useState('')
   const [grade, setGrade] = useState('')
   const [gradeError, setGradeError] = useState(false)
   const [sentTo, setSentTo] = useState<string | null>(null)
@@ -76,13 +77,13 @@ export function RegisterForm({ signedInEmail }: { signedInEmail?: string }) {
         setGradeError(false)
 
         if (signedInEmail) {
-          saveProfile.mutate({ program, grade: parsed })
+          saveProfile.mutate({ program, degree, grade: parsed })
           return
         }
 
         // Parked rather than sent: the address is not confirmed yet, and the
         // link is what turns these into a record.
-        savePending({ program, grade: parsed })
+        savePending({ program, degree, grade: parsed })
         requestOtp.mutate(email, { onSuccess: () => setSentTo(email) })
       }}
     >
@@ -101,6 +102,19 @@ export function RegisterForm({ signedInEmail }: { signedInEmail?: string }) {
             autoComplete="email"
           />
         )}
+
+        <Select
+          label={t('degreeLabel')}
+          placeholder={t('degreePlaceholder')}
+          value={degree}
+          onChange={setDegree}
+        >
+          {DEGREES.map((name) => (
+            <option key={name} value={name}>
+              {name}
+            </option>
+          ))}
+        </Select>
 
         <Select
           label={t('programLabel')}
@@ -169,7 +183,7 @@ function Field({
         {...props}
         required
         onChange={(event) => onChange(event.target.value)}
-        className={`input w-full bg-base-200/60 ${className}`}
+        className={`input w-full bg-base-200 ${className}`}
       />
     </label>
   )
@@ -197,7 +211,7 @@ function Select({
         required
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="select w-full bg-base-200/60"
+        className="select w-full bg-base-200"
       >
         {/* Disabled rather than absent, so an empty select fails validation
             instead of silently submitting the first program in the list. */}

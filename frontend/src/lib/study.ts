@@ -29,6 +29,13 @@ export const PROGRAMS = [
  */
 export const GRADES = [1.0, 1.3, 1.7, 2.0, 2.3, 2.7, 3.0, 3.3, 3.7, 4.0, 5.0]
 
+/**
+ * Bachelor and Master are ranked apart. A Master intake has already been
+ * filtered on its Bachelor result, so those grades sit better and the two
+ * populations are not comparable.
+ */
+export const DEGREES = ['Bachelor', 'Master'] as const
+
 export const BEST_GRADE = 1.0
 export const WORST_GRADE = 5.0
 

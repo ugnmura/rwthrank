@@ -10,7 +10,7 @@
  */
 const KEY = 'rwthrank.pending-profile'
 
-export type PendingProfile = { program: string; grade: number }
+export type PendingProfile = { program: string; degree: string; grade: number }
 
 export function savePending(profile: PendingProfile) {
   try {
@@ -28,7 +28,13 @@ export function takePending(): PendingProfile | null {
     localStorage.removeItem(KEY)
 
     const parsed = JSON.parse(raw) as PendingProfile
-    if (typeof parsed?.program !== 'string' || typeof parsed?.grade !== 'number') return null
+    if (
+      typeof parsed?.program !== 'string' ||
+      typeof parsed?.degree !== 'string' ||
+      typeof parsed?.grade !== 'number'
+    ) {
+      return null
+    }
 
     return parsed
   } catch {

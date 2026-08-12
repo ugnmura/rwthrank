@@ -30,7 +30,9 @@
     "reveal": "Platzierung anzeigen",
     "gradeInvalid": "Bitte eine Note zwischen 1,0 und 5,0 eintragen.",
     "sentLabel": "E-Mail unterwegs",
-    "sentBody": "Klick den Link in der E-Mail, dann siehst du deine Platzierung. Der Link gilt fünf Minuten."
+    "sentBody": "Klick den Link in der E-Mail, dann siehst du deine Platzierung. Der Link gilt fünf Minuten.",
+    "degreeLabel": "Abschluss",
+    "degreePlaceholder": "Abschluss wählen"
   },
   "signedIn": {
     "label": "Angemeldet",
@@ -67,7 +69,8 @@
     "modules": "Module",
     "apply": "Fach und Note übernehmen",
     "applying": "Wird übernommen",
-    "applied": "Übernommen. Deine Platzierung ist aktualisiert."
+    "applied": "Übernommen. Deine Platzierung ist aktualisiert.",
+    "degree": "Abschluss"
   },
   "curve": {
     "alt": "Verteilung der Noten von 1,0 bis 5,0. Der größte Anteil liegt bei 2,3.",
@@ -87,5 +90,44 @@
     "linkIncomplete": "Dem Link fehlt etwas. Fordere eine neue E-Mail an.",
     "linkFailed": "Der Link ist abgelaufen oder wurde schon benutzt.",
     "startOver": "Neu anfangen"
+  },
+  "theme": {
+    "label": "Darstellung",
+    "system": "System",
+    "light": "Hell",
+    "dark": "Dunkel"
+  },
+  "nav": {
+    "legal": "Impressum & Datenschutz"
+  },
+  "legal": {
+    "title": "Impressum und Datenschutz",
+    "imprintTitle": "Impressum",
+    "imprintBody": "Angaben gemäß § 5 DDG:\n\n[NAME EINTRAGEN]\n[STRASSE UND HAUSNUMMER]\n[PLZ UND ORT]\nDeutschland\n\nKontakt: kontakt@rwthrank.mindevice.net",
+    "controllerTitle": "Verantwortlich für die Datenverarbeitung",
+    "controllerBody": "Verantwortlich im Sinne der DSGVO ist die im Impressum genannte Person. Fragen zum Datenschutz gehen an dieselbe Adresse.",
+    "dataTitle": "Welche Daten verarbeitet werden",
+    "dataBody": "rwthrank speichert so wenig wie möglich. Konkret sind das:",
+    "dataEmail": "Deine E-Mail-Adresse. Sie ist dein Konto und der Weg, dir den Anmeldelink zu schicken.",
+    "dataProfile": "Fach, Abschluss und Gesamtnote. Ohne diese Angaben gibt es keine Platzierung.",
+    "dataTranscript": "Ein hochgeladener Notenspiegel wird nur im Arbeitsspeicher gelesen und danach verworfen. Die Datei wird nicht gespeichert. Übernommen werden nur Fach, Abschluss und Note.",
+    "dataLogs": "Server-Logs mit IP-Adresse und Zeitpunkt, wie sie beim Betrieb jeder Website anfallen.",
+    "basisTitle": "Rechtsgrundlage",
+    "basisBody": "Die Verarbeitung deiner E-Mail-Adresse stützt sich auf Art. 6 Abs. 1 lit. b DSGVO, weil sie zur Bereitstellung des Kontos nötig ist. Fach, Abschluss und Note gibst du freiwillig an; Rechtsgrundlage ist Art. 6 Abs. 1 lit. a DSGVO. Du kannst diese Einwilligung jederzeit widerrufen, indem du dein Konto löschen lässt.",
+    "processorsTitle": "Dienste, die dabei mitwirken",
+    "processorsBody": "Für den Betrieb kommen folgende Anbieter zum Einsatz:",
+    "processorHetzner": "Hetzner Online GmbH, Deutschland: Server und Datenbank.",
+    "processorCloudflare": "Cloudflare, Inc.: DNS und Weiterleitung von E-Mails an die Betreiberadresse. Verarbeitung auch in den USA.",
+    "processorGithub": "GitHub, Inc. (Microsoft): Auslieferung der Website über GitHub Pages. Verarbeitung auch in den USA.",
+    "processorResend": "Resend, Inc.: Versand der Anmelde-E-Mails, Verarbeitung in der EU (Irland).",
+    "storageTitle": "Speicherung im Browser",
+    "storageBody": "Es werden keine Cookies zu Werbe- oder Analysezwecken gesetzt. Im lokalen Speicher deines Browsers liegen nur dein Anmelde-Token sowie deine Einstellungen für Sprache und Darstellung. Ohne diese funktioniert die Anmeldung nicht, deshalb ist dafür keine Einwilligung erforderlich.",
+    "retentionTitle": "Speicherdauer",
+    "retentionBody": "Konto und Angaben bleiben gespeichert, bis du die Löschung verlangst. Anmeldecodes verfallen nach fünf Minuten und werden nach Gebrauch sofort gelöscht.",
+    "rightsTitle": "Deine Rechte",
+    "rightsBody": "Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch. Eine formlose E-Mail an die oben genannte Adresse genügt. Außerdem kannst du dich bei einer Datenschutz-Aufsichtsbehörde beschweren, in Nordrhein-Westfalen bei der Landesbeauftragten für Datenschutz und Informationsfreiheit NRW.",
+    "trackingTitle": "Kein Tracking",
+    "trackingBody": "rwthrank verwendet keine Analyse-Tools, kein Profiling und keine Werbenetzwerke. Deshalb gibt es auch kein Cookie-Banner.",
+    "updated": "Stand: August 2026. Dieser Text ist eine allgemeine Vorlage und ersetzt keine Rechtsberatung."
   }
 }
