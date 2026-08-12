@@ -228,7 +228,8 @@
     "people": "People compared",
     "peopleDesc": "with this selection",
     "anySemesterHint": "Including semesters you have not sat yet.",
-    "emptyShort": "no graded classes here"
+    "emptyShort": "no graded classes here",
+    "tooFew": "Too few others to average"
   },
   "login": {
     "title": "Sign in",

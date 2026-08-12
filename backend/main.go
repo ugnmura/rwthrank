@@ -45,6 +45,7 @@ func main() {
 	})
 
 	config.ApplyFromEnv(app)
+	config.ApplySecurity(app)
 	auth.RegisterOTP(app)
 	auth.RegisterPrune(app)
 	rank.RegisterRoutes(app)

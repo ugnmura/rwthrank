@@ -79,14 +79,14 @@ export function CompareSection() {
                   {data.cohortAverage ? grade(data.cohortAverage) : '—'}
                 </h2>
                 <p className="mt-1 max-w-md text-sm leading-relaxed text-base-content/60">
-                  {t('notMine')}
+                  {data.cohortAverage ? t('notMine') : t('tooFew')}
                 </p>
 
                 <StatGrid columns="three" className="mt-6">
                   <Stat
                     label={t('cohortMedian')}
                     value={data.cohortMedian ? grade(data.cohortMedian) : '—'}
-                    hint={t('medianDesc')}
+                    hint={data.cohortMedian ? t('medianDesc') : t('tooFew')}
                   />
                   <Stat
                     label={t('people')}
@@ -121,15 +121,17 @@ export function CompareSection() {
                     hint={data.official ? t('officialShort') : t('computedShort')}
                     tone="accent"
                   />
+                  {/* Withheld rather than missing when the group is one
+                      person: an average over one is that person's grade. */}
                   <Stat
                     label={t('cohortAverage')}
                     value={data.cohortAverage ? grade(data.cohortAverage) : '—'}
-                    hint={t('cohortDesc')}
+                    hint={data.cohortAverage ? t('cohortDesc') : t('tooFew')}
                   />
                   <Stat
                     label={t('cohortMedian')}
                     value={data.cohortMedian ? grade(data.cohortMedian) : '—'}
-                    hint={t('medianDesc')}
+                    hint={data.cohortMedian ? t('medianDesc') : t('tooFew')}
                   />
                   <Stat
                     label={t('counted')}

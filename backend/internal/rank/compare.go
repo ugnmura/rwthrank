@@ -141,7 +141,8 @@ func handleCompare(e *core.RequestEvent) error {
 	}
 
 	out.Total = totals.Total
-	if totals.Total > 0 {
+	// Withheld when the group is one person: see privacy.go.
+	if mayReveal(totals.Total, hasMine) {
 		out.CohortAverage = &totals.Cohort
 	}
 
@@ -151,7 +152,7 @@ func handleCompare(e *core.RequestEvent) error {
 		out.Rank, out.Percentile = &rank, &percentile
 	}
 
-	if totals.Total > 0 {
+	if mayReveal(totals.Total, hasMine) {
 		stats, err := statsOver(e.App, "SELECT a.avg AS value FROM ("+averages+") a", params)
 		if err == nil {
 			out.CohortMedian = &stats.Median
@@ -302,23 +303,27 @@ func officialAverage(e *core.RequestEvent) error {
 	percentile := math.Round(float64(rank)/float64(totals.Total)*1000) / 10
 
 	result := &compareResponse{
-		Average:       &grade,
-		Credits:       credits,
-		Courses:       counted,
-		Official:      true,
-		Rank:          &rank,
-		Total:         totals.Total,
-		Percentile:    &percentile,
-		CohortAverage: &totals.Cohort,
+		Average:    &grade,
+		Credits:    credits,
+		Courses:    counted,
+		Official:   true,
+		Rank:       &rank,
+		Total:      totals.Total,
+		Percentile: &percentile,
+	}
+	if mayReveal(totals.Total, true) {
+		result.CohortAverage = &totals.Cohort
 	}
 
-	stats, err := statsOver(e.App, `
-		SELECT t.grade AS value FROM transcripts t
-		WHERE t.grade IS NOT NULL
-		  AND t.id = (SELECT id FROM transcripts WHERE user = t.user ORDER BY uploaded DESC LIMIT 1)`,
-		dbx.Params{})
-	if err == nil {
-		result.CohortMedian = &stats.Median
+	if mayReveal(totals.Total, true) {
+		stats, err := statsOver(e.App, `
+			SELECT t.grade AS value FROM transcripts t
+			WHERE t.grade IS NOT NULL
+			  AND t.id = (SELECT id FROM transcripts WHERE user = t.user ORDER BY uploaded DESC LIMIT 1)`,
+			dbx.Params{})
+		if err == nil {
+			result.CohortMedian = &stats.Median
+		}
 	}
 
 	return e.JSON(http.StatusOK, result)

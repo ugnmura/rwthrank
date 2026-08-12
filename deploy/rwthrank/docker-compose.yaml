@@ -10,6 +10,10 @@ services:
     container_name: rwthrank-backend
     restart: unless-stopped
     env_file: backend.env
+    environment:
+      # Rate limits count per client, and behind Traefik the client address
+      # only appears in this header.
+      PROXY_IP_HEADER: X-Forwarded-For
     security_opt:
       - no-new-privileges:true
     deploy:

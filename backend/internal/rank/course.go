@@ -45,9 +45,19 @@ func handleCourseRank(e *core.RequestEvent) error {
 	}
 	out.Total = total
 
-	// What the class looks like as a whole, shown whether or not the caller
-	// sat it: the average moves with a few outliers, the median does not.
-	if total > 0 {
+	// The caller's own standing in it, if they sat it at all. Read first
+	// because whether they are in the class changes how small it is without
+	// them, which is what decides the next paragraph.
+	mine, err := bestInCourse(e.App, courseID, e.Auth.Id)
+	if err != nil {
+		return e.InternalServerError("Failed to read your grade.", err)
+	}
+
+	// What the class looks like as a whole, shown whether or not the caller sat
+	// it: the average moves with a few outliers, the median does not. Withheld
+	// for a class of one other person, where the average is their grade — see
+	// privacy.go. A seminar of three is exactly where somebody would look.
+	if mayReveal(total, mine != 0) {
 		stats, err := statsOver(e.App, `
 			SELECT MIN(grade) AS value
 			FROM results
@@ -59,11 +69,6 @@ func handleCourseRank(e *core.RequestEvent) error {
 		out.CohortAverage, out.CohortMedian = &stats.Average, &stats.Median
 	}
 
-	// The caller's own standing in it, if they sat it at all.
-	mine, err := bestInCourse(e.App, courseID, e.Auth.Id)
-	if err != nil {
-		return e.InternalServerError("Failed to read your grade.", err)
-	}
 	if mine == 0 {
 		return e.JSON(http.StatusOK, out)
 	}

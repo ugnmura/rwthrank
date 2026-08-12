@@ -74,12 +74,41 @@ check "unfiltered reports the printed grade" "True" "$(body -X POST $B/api/compa
 check "  and it equals the transcript" "1.6" "$(body -X POST $B/api/compare -H "Authorization: $A" -H 'Content-Type: application/json' -d '{"studySemester":-1}' | python3 -c 'import sys,json;print(json.load(sys.stdin)["average"])')"
 check "a narrowed one is marked computed" "False" "$(body -X POST $B/api/compare -H "Authorization: $A" -H 'Content-Type: application/json' -d '{"studySemester":-1,"semesters":["24S"]}' | python3 -c 'import sys,json;print(json.load(sys.stdin)["official"])')"
 check "a semester with nothing in it is empty, not an error" "None" "$(body -X POST $B/api/compare -H "Authorization: $A" -H 'Content-Type: application/json' -d '{"studySemester":-1,"semesters":["99W"]}' | python3 -c 'import sys,json;print(json.load(sys.stdin)["average"])')"
-check "median is reported" "yes" "$(body -X POST $B/api/compare -H "Authorization: $A" -H 'Content-Type: application/json' -d '{"studySemester":-1}' | python3 -c 'import sys,json;print("yes" if json.load(sys.stdin)["cohortMedian"] is not None else "no")')"
+check "an average over yourself alone is withheld" "None" "$(body -X POST $B/api/compare -H "Authorization: $A" -H 'Content-Type: application/json' -d '{"studySemester":-1}' | python3 -c 'import sys,json;print(json.load(sys.stdin)["cohortAverage"])')"
 check "  and it counts the modules behind it" "23" "$(body -X POST $B/api/compare -H "Authorization: $A" -H 'Content-Type: application/json' -d '{"studySemester":-1}' | python3 -c 'import sys,json;print(json.load(sys.stdin)["courses"])')"
 check "an empty selection is a cohort of nobody" "0" "$(body -X POST $B/api/compare -H "Authorization: $A" -H 'Content-Type: application/json' -d '{"studySemester":-1,"semesters":["99W"]}' | python3 -c 'import sys,json;print(json.load(sys.stdin)["total"])')"
 check "the semester list covers everyone" "yes" "$(body $B/api/compare/options -H "Authorization: $A" | python3 -c 'import sys,json;print("yes" if "24S" in json.load(sys.stdin)["semesters"] else "no")')"
 check "the semester list needs a token" "401" "$(code $B/api/compare/options)"
 check "compare needs a token" "401" "$(code -X POST $B/api/compare -H 'Content-Type: application/json' -d '{}')"
+
+echo "== the account record =="
+ACCT_A=$(body $B/api/collections/users/auth-refresh -X POST -H "Authorization: $A" | python3 -c 'import sys,json;print(json.load(sys.stdin)["record"]["id"])')
+check "an account cannot be edited through the API" "403" "$(code -X PATCH $B/api/collections/users/records/$ACCT_A -H "Authorization: $A" -H 'Content-Type: application/json' -d '{"emailVisibility":true}')"
+check "an account cannot be created through the API" "403" "$(code -X POST $B/api/collections/users/records -H 'Content-Type: application/json' -d '{"email":"x@example.com","password":"12345678","passwordConfirm":"12345678"}')"
+check "one account cannot read another" "404" "$(code $B/api/collections/users/records/$ACCT_A -H "Authorization: $C")"
+check "the account list is only ever yourself" "1" "$(body $B/api/collections/users/records -H "Authorization: $A" | python3 -c 'import sys,json;print(json.load(sys.stdin)["totalItems"])')"
+check "signed out, the account list is empty" "0" "$(body $B/api/collections/users/records | python3 -c 'import sys,json;print(json.load(sys.stdin)["totalItems"])')"
+
+echo "== the stored document =="
+PDF=$(body "$B/api/collections/transcripts/records?filter=$(python3 -c "import urllib.parse;print(urllib.parse.quote('pdf!=\"\"'))")" -H "Authorization: $A" | python3 -c 'import sys,json;i=json.load(sys.stdin)["items"][0];print(i["id"]+"/"+i["pdf"])')
+check "the PDF is not served from a guessable URL" "blocked" "$(body $B/api/files/transcripts/$PDF | head -c 5 | grep -q '%PDF' && echo served || echo blocked)"
+check "  not even with somebody else's token" "blocked" "$(body $B/api/files/transcripts/$PDF -H "Authorization: $C" | head -c 5 | grep -q '%PDF' && echo served || echo blocked)"
+check "  and the request is refused outright" "yes" "$(test "$(code $B/api/files/transcripts/$PDF)" != "200" && echo yes || echo no)"
+
+echo "== one person is not a cohort =="
+E=$(otp e@example.com 2.7)
+curl -s -o /dev/null -X POST $B/api/transcript -H "Authorization: $E" -F file=@$T
+check "with one other person the average is withheld" "None" "$(body -X POST $B/api/compare -H "Authorization: $A" -H 'Content-Type: application/json' -d '{"studySemester":-1,"semesters":["24S"]}' | python3 -c 'import sys,json;print(json.load(sys.stdin)["cohortAverage"])')"
+check "  and so is the median" "None" "$(body -X POST $B/api/compare -H "Authorization: $A" -H 'Content-Type: application/json' -d '{"studySemester":-1,"semesters":["24S"]}' | python3 -c 'import sys,json;print(json.load(sys.stdin)["cohortMedian"])')"
+check "  while the placement still stands" "1" "$(body -X POST $B/api/compare -H "Authorization: $A" -H 'Content-Type: application/json' -d '{"studySemester":-1,"semesters":["24S"]}' | python3 -c 'import sys,json;print(json.load(sys.stdin)["rank"])')"
+F=$(otp f@example.com 3.3)
+curl -s -o /dev/null -X POST $B/api/transcript -H "Authorization: $F" -F file=@$T
+check "with two others it is reported again" "yes" "$(body -X POST $B/api/compare -H "Authorization: $A" -H 'Content-Type: application/json' -d '{"studySemester":-1}' | python3 -c 'import sys,json;print("yes" if json.load(sys.stdin)["cohortAverage"] is not None else "no")')"
+check "  median too" "yes" "$(body -X POST $B/api/compare -H "Authorization: $A" -H 'Content-Type: application/json' -d '{"studySemester":-1}' | python3 -c 'import sys,json;print("yes" if json.load(sys.stdin)["cohortMedian"] is not None else "no")')"
+check "  and it averages the others, not just you" "yes" "$(body -X POST $B/api/compare -H "Authorization: $A" -H 'Content-Type: application/json' -d '{"studySemester":-1}' | python3 -c 'import sys,json;d=json.load(sys.stdin);print("yes" if abs(d["cohortAverage"] - d["average"]) > 0.001 else "no")')"
+COURSE=$(body "$B/api/collections/results/records?perPage=1" -H "Authorization: $A" | python3 -c 'import sys,json;print(json.load(sys.stdin)["items"][0]["course"])')
+check "a class the caller is one of three in reports its average" "yes" "$(body $B/api/rank/course/$COURSE -H "Authorization: $A" | python3 -c 'import sys,json;print("yes" if json.load(sys.stdin)["cohortAverage"] is not None else "no")')"
+check "  and counts everyone who sat it" "3" "$(body $B/api/rank/course/$COURSE -H "Authorization: $A" | python3 -c 'import sys,json;print(json.load(sys.stdin)["total"])')"
 
 echo "== deletion =="
 DEL=$(otp del@example.com 2.0)
@@ -88,6 +117,11 @@ ACCT=$(body $B/api/collections/users/auth-refresh -X POST -H "Authorization: $DE
 check "self-delete succeeds" "204" "$(code -X DELETE $B/api/collections/users/records/$ACCT -H "Authorization: $DEL")"
 check "  their transcripts are gone" "0" "$(body "$B/api/collections/transcripts/records" -H "Authorization: $DEL" | python3 -c 'import sys,json;print(json.load(sys.stdin).get("totalItems",0))' 2>/dev/null || echo 0)"
 check "a token for a deleted account stops working" "401" "$(code $B/api/rank -H "Authorization: $DEL")"
+
+echo "== rate limits =="
+for i in $(seq 1 12); do curl -s -o /dev/null -X POST $B/api/collections/users/request-otp -H 'Content-Type: application/json' -d '{"email":"flood@example.com"}'; done
+check "a flood of code requests is refused" "429" "$(code -X POST $B/api/collections/users/request-otp -H 'Content-Type: application/json' -d '{"email":"flood@example.com"}')"
+
 
 echo
 echo "  passed $pass, failed $fail"
