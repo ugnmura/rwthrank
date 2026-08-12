@@ -97,6 +97,18 @@ body {
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
+/*
+ * Tailwind v4's reset dropped the pointer cursor on buttons, so every control
+ * on the page looked unclickable. Disabled ones keep the default, since they
+ * are not.
+ */
+button:not(:disabled),
+[role='button'],
+label.file-input,
+summary {
+  cursor: pointer;
+}
+
 /* Tabular figures everywhere a grade or a code is shown, so digits don't shift. */
 .tnum {
   font-variant-numeric: tabular-nums;
