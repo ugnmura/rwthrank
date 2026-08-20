@@ -20,6 +20,10 @@ function answer(status: number, body: unknown, statusText = '') {
   return fetchMock
 }
 
+function user(id: string, email: string) {
+  return { id, email, collectionId: 'users', collectionName: 'users' }
+}
+
 afterEach(() => {
   globalThis.fetch = realFetch
   pb.authStore.clear()
@@ -44,6 +48,32 @@ describe('call', () => {
 
     const [, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit]
     expect((init.headers as Record<string, string>).Authorization).toBe('')
+  })
+
+  test('a rejected session is cleared so protected screens can redirect', async () => {
+    pb.authStore.save('stale-token', user('user-1', 'me@example.com'))
+    answer(401, { message: 'The request requires valid record authorization token.' })
+
+    await expect(call('/api/rank')).rejects.toThrow('valid record authorization token')
+
+    expect(pb.authStore.token).toBe('')
+    expect(pb.authStore.record).toBeNull()
+  })
+
+  test('an old rejected request cannot clear a newer session', async () => {
+    pb.authStore.save('old-token', user('user-1', 'old@example.com'))
+    globalThis.fetch = mock(async () => {
+      pb.authStore.save('new-token', user('user-2', 'new@example.com'))
+      return new Response(
+        JSON.stringify({ message: 'The request requires valid record authorization token.' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      )
+    }) as unknown as typeof fetch
+
+    await expect(call('/api/rank')).rejects.toThrow('valid record authorization token')
+
+    expect(pb.authStore.token).toBe('new-token')
+    expect(pb.authStore.record?.id).toBe('user-2')
   })
 
   test('a caller may add headers without losing the token', async () => {

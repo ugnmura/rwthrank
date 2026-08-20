@@ -1,13 +1,24 @@
-import { afterEach, describe, expect, mock, test } from 'bun:test'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, mock, test } from 'bun:test'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import type { ReactElement } from 'react'
+
+import { pb } from '@/lib/pocketbase'
 
 let currentPath = '/dashboard'
-const logout = mock(() => {})
-let currentUser: { id: string; email: string } | null = { id: 'u1', email: 'me@example.com' }
+const replace = mock(() => {})
+let queryClient: QueryClient
+
+type User = {
+  id: string
+  email: string
+  collectionId: string
+  collectionName: string
+}
 
 mock.module('next/navigation', () => ({
   usePathname: () => currentPath,
-  useRouter: () => ({ push: mock(() => {}), replace: mock(() => {}) }),
+  useRouter: () => ({ push: mock(() => {}), replace }),
   useSearchParams: () => new URLSearchParams(),
 }))
 
@@ -18,20 +29,42 @@ mock.module('next-intl', () => ({
   useLocale: () => 'de',
 }))
 
-mock.module('@/lib/auth', () => ({
-  useAuthRecord: () => ({ data: currentUser, isPending: false }),
-  useLogout: () => logout,
-}))
-
 const { Stat, StatGrid } = await import('@/app/stat-grid')
 const { Breadcrumbs } = await import('@/app/breadcrumbs')
 const { MobileMenu } = await import('@/app/mobile-menu')
+const { SignedInOnly } = await import('@/app/signed-in-only')
+
+beforeEach(() => {
+  currentPath = '/dashboard'
+  queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  setUser({
+    id: 'u1',
+    email: 'me@example.com',
+    collectionId: 'users',
+    collectionName: 'users',
+  })
+})
 
 afterEach(() => {
   cleanup()
-  logout.mockClear()
-  currentUser = { id: 'u1', email: 'me@example.com' }
+  pb.authStore.clear()
+  replace.mockClear()
 })
+
+function setUser(user: User | null) {
+  if (user) {
+    const payload = btoa(JSON.stringify({ exp: Math.floor(Date.now() / 1000) + 60 }))
+    pb.authStore.save(`header.${payload}.signature`, user)
+  } else {
+    pb.authStore.clear()
+  }
+
+  queryClient.setQueryData(['auth', 'record'], user)
+}
+
+function renderWithAuth(element: ReactElement) {
+  return render(<QueryClientProvider client={queryClient}>{element}</QueryClientProvider>)
+}
 
 describe('the figures', () => {
   test('a cell shows its label, value and hint', () => {
@@ -99,7 +132,7 @@ describe('the breadcrumbs', () => {
 describe('the mobile menu', () => {
   test('every destination is a link, and settings sits under the dashboard', () => {
     currentPath = '/dashboard'
-    render(<MobileMenu />)
+    renderWithAuth(<MobileMenu />)
 
     const hrefs = screen.getAllByRole('link').map((link) => link.getAttribute('href'))
     expect(hrefs).toEqual(['/dashboard', '/dashboard/compare', '/dashboard/settings'])
@@ -107,7 +140,7 @@ describe('the mobile menu', () => {
 
   test('the page you are on is marked, and only that one', () => {
     currentPath = '/dashboard/compare'
-    render(<MobileMenu />)
+    renderWithAuth(<MobileMenu />)
 
     const current = screen.getAllByRole('link').filter((link) => link.getAttribute('aria-current'))
     expect(current).toHaveLength(1)
@@ -116,22 +149,23 @@ describe('the mobile menu', () => {
 
   test('a trailing slash still marks the page you are on', () => {
     currentPath = '/dashboard/settings/'
-    render(<MobileMenu />)
+    renderWithAuth(<MobileMenu />)
 
     const current = screen.getAllByRole('link').filter((link) => link.getAttribute('aria-current'))
     expect(current[0].getAttribute('href')).toBe('/dashboard/settings')
   })
 
-  test('signing out is a button and it signs out', () => {
-    render(<MobileMenu />)
+  test('signing out is a button and it signs out', async () => {
+    renderWithAuth(<MobileMenu />)
 
     fireEvent.click(screen.getByText('signOut'))
-    expect(logout).toHaveBeenCalledTimes(1)
+    expect(pb.authStore.record).toBeNull()
+    await waitFor(() => expect(screen.getByText('signIn')).toBeDefined())
   })
 
   test('signed out there is one way in and nothing else', () => {
-    currentUser = null
-    render(<MobileMenu />)
+    setUser(null)
+    renderWithAuth(<MobileMenu />)
 
     const hrefs = screen.getAllByRole('link').map((link) => link.getAttribute('href'))
     expect(hrefs).toEqual(['/login'])
@@ -139,12 +173,12 @@ describe('the mobile menu', () => {
   })
 
   test('the address is never shown: it is not something to press', () => {
-    render(<MobileMenu />)
+    renderWithAuth(<MobileMenu />)
     expect(screen.queryByText('me@example.com')).toBeNull()
   })
 
   test('the language you are reading is held down, the other is offered', () => {
-    render(<MobileMenu />)
+    renderWithAuth(<MobileMenu />)
 
     const german = screen.getByText('Deutsch')
     const english = screen.getByText('English')
@@ -157,7 +191,22 @@ describe('the mobile menu', () => {
   })
 
   test('the panel is hidden once there is room for the real header', () => {
-    const { container } = render(<MobileMenu />)
+    const { container } = renderWithAuth(<MobileMenu />)
     expect((container.firstElementChild as HTMLElement).className).toContain('sm:hidden')
+  })
+})
+
+describe('protected pages', () => {
+  test('a signed-out visitor sees no private content and is sent to login', async () => {
+    setUser(null)
+
+    renderWithAuth(
+      <SignedInOnly>
+        <p>private</p>
+      </SignedInOnly>
+    )
+
+    expect(screen.queryByText('private')).toBeNull()
+    await waitFor(() => expect(replace).toHaveBeenCalledWith('/login'))
   })
 })

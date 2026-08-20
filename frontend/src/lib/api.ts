@@ -9,13 +9,13 @@ import { pb } from './pocketbase'
  * checking on its own, and none of it needs React.
  */
 export async function call(path: string, init?: RequestInit) {
+  const token = pb.authStore.token
   const response = await fetch(`${pb.baseURL}${path}`, {
     ...init,
-    // Signed out this is the empty string, which the server reads as no token
-    // and answers 401 to. That is the correct answer, so it is not special-cased.
-    headers: { Authorization: pb.authStore.token, ...init?.headers },
+    headers: { Authorization: token, ...init?.headers },
   })
 
+  if (response.status === 401 && token && pb.authStore.token === token) pb.authStore.clear()
   if (!response.ok) throw await failure(response)
 
   return response.json()

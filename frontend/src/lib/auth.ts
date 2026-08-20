@@ -8,6 +8,15 @@ import type { UsersResponse } from '@/types/pocketbase'
 
 const authKey = ['auth', 'record'] as const
 
+function currentAuthRecord() {
+  if (pb.authStore.token && !pb.authStore.isValid) {
+    pb.authStore.clear()
+    return null
+  }
+
+  return (pb.authStore.record as UsersResponse | null) ?? null
+}
+
 /**
  * Current user, or null when signed out.
  *
@@ -22,14 +31,14 @@ export function useAuthRecord() {
   useEffect(
     () =>
       pb.authStore.onChange(() => {
-        queryClient.setQueryData(authKey, pb.authStore.record ?? null)
+        queryClient.setQueryData(authKey, currentAuthRecord())
       }),
     [queryClient]
   )
 
   return useQuery({
     queryKey: authKey,
-    queryFn: () => (pb.authStore.record as UsersResponse | null) ?? null,
+    queryFn: currentAuthRecord,
     staleTime: Infinity,
   })
 }
